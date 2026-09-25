@@ -4,10 +4,6 @@ import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.Coordinates
 import javax.inject.Inject
 
-/**
- * Türkiye'nin büyük şehirleri. Kimlikler ve koordinatlar Open-Meteo geocoding
- * sonuçlarıyla aynıdır; aramadan eklenen favorilerle çakışmaz.
- */
 class TurkishCityCatalog @Inject constructor() : CityCatalog {
 
     override fun cities(): List<City> = CITIES

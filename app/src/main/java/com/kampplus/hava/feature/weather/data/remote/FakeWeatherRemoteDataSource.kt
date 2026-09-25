@@ -8,10 +8,6 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 
-/**
- * CP1–CP3 için koda gömülü sabit hava verisi. İnternet gerektirmez; aynı şehir için
- * her zaman aynı değeri üretir. CP4'te DI binding'i değiştirilerek gerçek API ile yer değiştirir.
- */
 class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSource {
 
     override suspend fun getCurrentWeather(

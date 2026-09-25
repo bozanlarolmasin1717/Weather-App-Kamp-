@@ -5,6 +5,8 @@ import com.kampplus.hava.feature.weather.data.local.TurkishCityCatalog
 import com.kampplus.hava.feature.weather.data.remote.FakeWeatherRemoteDataSource
 import com.kampplus.hava.feature.weather.data.remote.WeatherRemoteDataSource
 import com.kampplus.hava.feature.weather.data.repository.WeatherRepositoryImpl
+import com.kampplus.hava.feature.weather.domain.policy.WeatherConditionClassifier
+import com.kampplus.hava.feature.weather.domain.policy.WmoWeatherConditionClassifier
 import com.kampplus.hava.feature.weather.domain.repository.WeatherRepository
 import dagger.Binds
 import dagger.Module
@@ -31,4 +33,9 @@ abstract class WeatherDataModule {
     abstract fun bindCityCatalog(
         impl: TurkishCityCatalog
     ): CityCatalog
+
+    @Binds
+    abstract fun bindWeatherConditionClassifier(
+        impl: WmoWeatherConditionClassifier
+    ): WeatherConditionClassifier
 }
