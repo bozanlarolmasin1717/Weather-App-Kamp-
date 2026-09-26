@@ -37,6 +37,8 @@ fun ForecastDetailRoute(
         },
         onFavoriteClick =
             viewModel::onToggleFavorite,
+        onRetry =
+            viewModel::onRetry,
         modifier = modifier
     )
 }
@@ -58,7 +60,8 @@ private fun Context.shareForecast(
         Intent(
             Intent.ACTION_SEND
         ).apply {
-            type = "text/plain"
+            type =
+                "text/plain"
 
             putExtra(
                 Intent.EXTRA_TEXT,

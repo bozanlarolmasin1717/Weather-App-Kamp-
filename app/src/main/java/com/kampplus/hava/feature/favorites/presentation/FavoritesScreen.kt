@@ -9,13 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
 import com.kampplus.hava.core.ui.component.EmptyView
+import com.kampplus.hava.core.ui.component.ErrorView
+import com.kampplus.hava.core.ui.component.LoadingView
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.feature.favorites.presentation.component.FavoriteCityCard
 
@@ -81,7 +82,7 @@ fun FavoritesScreen(
             when (uiState) {
 
                 UiState.Loading ->
-                    CircularProgressIndicator()
+                    LoadingView()
 
                 UiState.Empty ->
                     EmptyView(
@@ -101,10 +102,11 @@ fun FavoritesScreen(
                     )
 
                 is UiState.Error ->
-                    Text(
-                        uiState
-                            .message
-                            .asString()
+                    ErrorView(
+                        message =
+                            uiState
+                                .message
+                                .asString()
                     )
 
                 is UiState.Success ->

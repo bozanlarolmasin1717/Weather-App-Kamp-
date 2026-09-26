@@ -9,7 +9,8 @@ import com.kampplus.hava.feature.weather.domain.model.City
 
 @Composable
 fun CityListRoute(
-    onCityClick: (City) -> Unit,
+    onCityClick:
+        (City) -> Unit,
     modifier: Modifier = Modifier,
     viewModel:
     CityListViewModel =
@@ -26,10 +27,14 @@ fun CityListRoute(
 
             viewModel
                 .findCity(cityId)
-                ?.let(onCityClick)
+                ?.let(
+                    onCityClick
+                )
         },
         onFavoriteClick =
             viewModel::onToggleFavorite,
+        onRetry =
+            viewModel::onRetry,
         modifier = modifier
     )
 }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,7 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
+import com.kampplus.hava.core.ui.component.ErrorView
 import com.kampplus.hava.core.ui.component.FavoriteToggleButton
+import com.kampplus.hava.core.ui.component.LoadingView
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
@@ -52,6 +53,8 @@ fun ForecastDetailScreen(
     onShare:
         (ForecastUiModel) -> Unit,
     onFavoriteClick:
+        () -> Unit,
+    onRetry:
         () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -128,20 +131,25 @@ fun ForecastDetailScreen(
             when (uiState) {
 
                 UiState.Loading ->
-                    CircularProgressIndicator()
+                    LoadingView()
 
                 UiState.Empty ->
-                    Text(
-                        stringResource(
-                            R.string.empty_generic
-                        )
+                    ErrorView(
+                        message =
+                            stringResource(
+                                R.string
+                                    .error_not_found
+                            )
                     )
 
                 is UiState.Error ->
-                    Text(
-                        uiState
-                            .message
-                            .asString()
+                    ErrorView(
+                        message =
+                            uiState
+                                .message
+                                .asString(),
+                        onRetry =
+                            onRetry
                     )
 
                 is UiState.Success ->
@@ -208,7 +216,8 @@ private fun ForecastContent(
                     horizontal = 16.dp
                 )
         ) {
-            forecast.daily
+            forecast
+                .daily
                 .forEachIndexed {
                         index,
                         day ->
@@ -306,7 +315,8 @@ private fun CurrentWeatherHeader(
                         Metric(
                             label =
                                 stringResource(
-                                    R.string.detail_feels_like
+                                    R.string
+                                        .detail_feels_like
                                 ),
                             value = it
                         )
@@ -318,7 +328,8 @@ private fun CurrentWeatherHeader(
                         Metric(
                             label =
                                 stringResource(
-                                    R.string.detail_humidity
+                                    R.string
+                                        .detail_humidity
                                 ),
                             value = it
                         )
@@ -330,7 +341,8 @@ private fun CurrentWeatherHeader(
                         Metric(
                             label =
                                 stringResource(
-                                    R.string.detail_wind
+                                    R.string
+                                        .detail_wind
                                 ),
                             value = it
                         )
@@ -352,17 +364,20 @@ private fun Metric(
         Text(
             text = value,
             style =
-                MaterialTheme.typography
+                MaterialTheme
+                    .typography
                     .titleMedium
         )
 
         Text(
             text = label,
             style =
-                MaterialTheme.typography
+                MaterialTheme
+                    .typography
                     .labelMedium,
             color =
-                MaterialTheme.colorScheme
+                MaterialTheme
+                    .colorScheme
                     .onSurfaceVariant
         )
     }
@@ -375,7 +390,8 @@ private fun SectionTitle(
     Text(
         text = text,
         style =
-            MaterialTheme.typography
+            MaterialTheme
+                .typography
                 .titleMedium,
         modifier =
             Modifier.padding(
@@ -393,7 +409,8 @@ private fun ForecastDetailScreenPreview() {
                 UiState.Success(
                     ForecastUiModel(
                         cityId = 1,
-                        cityName = "Ankara",
+                        cityName =
+                            "Ankara",
                         subtitle =
                             "Ankara, Türkiye",
                         temperatureText =
@@ -437,7 +454,8 @@ private fun ForecastDetailScreenPreview() {
                 ),
             onBack = {},
             onShare = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
+            onRetry = {}
         )
     }
 }
