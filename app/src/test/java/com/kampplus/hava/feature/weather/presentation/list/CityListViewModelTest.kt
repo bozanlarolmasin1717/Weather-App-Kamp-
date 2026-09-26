@@ -4,6 +4,10 @@ import app.cash.turbine.test
 import com.kampplus.hava.core.common.error.AppError
 import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.ui.state.UiState
+import com.kampplus.hava.feature.favorites.data.local.InMemoryFavoriteCityDataSource
+import com.kampplus.hava.feature.favorites.data.repository.FavoriteCityRepositoryImpl
+import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
+import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
@@ -22,9 +26,12 @@ class CityListViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeWeatherRepository()
+    private val favoritesRepository = FavoriteCityRepositoryImpl(InMemoryFavoriteCityDataSource())
 
     private fun createViewModel() = CityListViewModel(
         getCityWeathers = GetCityWeathersUseCase(repository),
+        observeFavoriteCityIds = ObserveFavoriteCityIdsUseCase(favoritesRepository),
+        toggleFavoriteCity = ToggleFavoriteCityUseCase(favoritesRepository),
         uiMapper = testUiMapper()
     )
 

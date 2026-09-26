@@ -14,7 +14,8 @@ data class ForecastUiModel(
     val humidityText: String?,
     val windText: String?,
     val hourly: List<HourlyUiModel>,
-    val daily: List<DailyUiModel>
+    val daily: List<DailyUiModel>,
+    val isFavorite: Boolean = false
 )
 
 data class HourlyUiModel(

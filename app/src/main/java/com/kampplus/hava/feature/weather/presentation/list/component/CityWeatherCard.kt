@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kampplus.hava.core.ui.component.FavoriteToggleButton
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.text.UiText
 import com.kampplus.hava.core.ui.theme.HavaTheme
@@ -21,7 +22,7 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
 
 @Composable
-fun CityWeatherCard(item: CityWeatherUiModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CityWeatherCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavoriteClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -48,6 +49,7 @@ fun CityWeatherCard(item: CityWeatherUiModel, onClick: () -> Unit, modifier: Mod
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+            FavoriteToggleButton(isFavorite = item.isFavorite, onClick = onFavoriteClick)
         }
     }
 }
@@ -64,9 +66,11 @@ private fun CityWeatherCardPreview() {
                 temperatureText = "21°",
                 temperatureC = 21.0,
                 conditionEmoji = "☀️",
-                conditionLabel = UiText.Dynamic("Açık")
+                conditionLabel = UiText.Dynamic("Açık"),
+                isFavorite = false
             ),
-            onClick = {}
+            onClick = {},
+            onFavoriteClick = {}
         )
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
+import com.kampplus.hava.core.ui.component.FavoriteToggleButton
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
@@ -46,6 +47,7 @@ fun ForecastDetailScreen(
     uiState: UiState<ForecastUiModel>,
     onBack: () -> Unit,
     onShare: (ForecastUiModel) -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -60,6 +62,7 @@ fun ForecastDetailScreen(
                 },
                 actions = {
                     if (uiState is UiState.Success) {
+                        FavoriteToggleButton(isFavorite = uiState.data.isFavorite, onClick = onFavoriteClick)
                         ShareButton(onClick = { onShare(uiState.data) })
                     }
                 }
@@ -108,11 +111,7 @@ private fun ForecastContent(forecast: ForecastUiModel, modifier: Modifier = Modi
 private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            TemperatureBadge(
-                text = forecast.temperatureText,
-                containerColor = temperatureColor(forecast.temperatureC),
-                size = 88.dp
-            )
+            TemperatureBadge(text = forecast.temperatureText, containerColor = temperatureColor(forecast.temperatureC), size = 88.dp)
             Column {
                 Text(
                     text = forecast.subtitle,
@@ -171,11 +170,13 @@ private fun ForecastDetailScreenPreview() {
                     humidityText = "%45",
                     windText = "12 km/sa",
                     hourly = List(8) { HourlyUiModel("1$it:00", "☀️", "2$it°", null) },
-                    daily = List(7) { DailyUiModel(UiText.Dynamic("Cuma"), "⛅", "14°", "24°", "%10") }
+                    daily = List(7) { DailyUiModel(UiText.Dynamic("Cuma"), "⛅", "14°", "24°", "%10") },
+                    isFavorite = true
                 )
             ),
             onBack = {},
-            onShare = {}
+            onShare = {},
+            onFavoriteClick = {}
         )
     }
 }

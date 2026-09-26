@@ -19,6 +19,7 @@ fun ForecastDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewM
         uiState = uiState,
         onBack = onBack,
         onShare = { forecast -> context.shareForecast(forecast) },
+        onFavoriteClick = viewModel::onToggleFavorite,
         modifier = modifier
     )
 }

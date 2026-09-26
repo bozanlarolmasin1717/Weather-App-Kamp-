@@ -2,11 +2,11 @@ package com.kampplus.hava.core.navigation
 
 import kotlinx.serialization.Serializable
 
-/**
- * Type-safe Compose Navigation hedefleri.
- */
 @Serializable
 data object ListDestination
+
+@Serializable
+data object FavoritesDestination
 
 @Serializable
 data class ForecastDestination(
