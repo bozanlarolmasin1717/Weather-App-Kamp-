@@ -1,6 +1,7 @@
 package com.kampplus.hava.feature.weather.presentation.model
 
 import com.kampplus.hava.core.ui.text.UiText
+import com.kampplus.hava.feature.weather.domain.policy.WeatherCondition
 
 data class ForecastUiModel(
     val cityId: Long,
@@ -15,7 +16,8 @@ data class ForecastUiModel(
     val windText: String?,
     val hourly: List<HourlyUiModel>,
     val daily: List<DailyUiModel>,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val condition: WeatherCondition = WeatherCondition.Unknown
 )
 
 data class HourlyUiModel(

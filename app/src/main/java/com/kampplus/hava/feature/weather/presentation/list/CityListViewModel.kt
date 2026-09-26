@@ -11,6 +11,7 @@ import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.CityWeather
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
+import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 import com.kampplus.hava.feature.weather.presentation.model.WeatherUiMapper
 import com.kampplus.hava.feature.weather.presentation.model.toFavorite
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -82,7 +83,8 @@ class CityListViewModel @Inject constructor(
                     if (result.data.isEmpty()) {
                         UiState.Empty
                     } else {
-                        UiState.Success(result.data.map { uiMapper.toListItem(it, isFavorite = it.city.id in favoriteIds) })
+                        val items = result.data.map { uiMapper.toListItem(it, isFavorite = it.city.id in favoriteIds) }
+                        UiState.Success(items.sortedWith(compareByDescending<CityWeatherUiModel> { it.isFavorite }))
                     }
                 is AppResult.Failure -> UiState.Error(result.error.toUiText())
             },

@@ -1,6 +1,8 @@
 package com.kampplus.hava.feature.weather.presentation.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,10 +22,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +40,7 @@ import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
 import com.kampplus.hava.core.ui.theme.HavaTheme
+import com.kampplus.hava.feature.weather.domain.policy.WeatherCondition
 import com.kampplus.hava.feature.weather.presentation.detail.component.DailyForecastItem
 import com.kampplus.hava.feature.weather.presentation.detail.component.HourlyForecastRow
 import com.kampplus.hava.feature.weather.presentation.detail.component.ShareButton
@@ -41,6 +48,7 @@ import com.kampplus.hava.feature.weather.presentation.model.DailyUiModel
 import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 import com.kampplus.hava.feature.weather.presentation.model.HourlyUiModel
 import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
+import com.kampplus.hava.feature.weather.presentation.model.weatherGradientColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,38 +62,61 @@ fun ForecastDetailScreen(
     modifier: Modifier = Modifier,
     isRefreshing: Boolean = false
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text((uiState as? UiState.Success)?.data?.cityName ?: stringResource(R.string.detail_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
-                },
-                actions = {
-                    if (uiState is UiState.Success) {
-                        FavoriteToggleButton(isFavorite = uiState.data.isFavorite, onClick = onFavoriteClick)
-                        ShareButton(onClick = { onShare(uiState.data) })
-                    }
-                }
+    val condition = (uiState as? UiState.Success)?.data?.condition ?: WeatherCondition.Unknown
+    val gradientColors = weatherGradientColors(condition)
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(gradientColors.topColor, gradientColors.bottomColor)
+                )
             )
-        }
-    ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = onRefresh,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when (uiState) {
-                UiState.Loading -> LoadingView()
-                UiState.Empty -> ErrorView(message = stringResource(R.string.error_not_found))
-                is UiState.Error -> ErrorView(message = uiState.message.asString(), onRetry = onRetry)
-                is UiState.Success -> ForecastContent(forecast = uiState.data)
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            (uiState as? UiState.Success)?.data?.cityName ?: stringResource(R.string.detail_title),
+                            color = Color.White
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        }
+                    },
+                    actions = {
+                        if (uiState is UiState.Success) {
+                            FavoriteToggleButton(isFavorite = uiState.data.isFavorite, onClick = onFavoriteClick)
+                            ShareButton(onClick = { onShare(uiState.data) })
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                when (uiState) {
+                    UiState.Loading -> LoadingView()
+                    UiState.Empty -> ErrorView(message = stringResource(R.string.error_not_found))
+                    is UiState.Error -> ErrorView(message = uiState.message.asString(), onRetry = onRetry)
+                    is UiState.Success -> ForecastContent(forecast = uiState.data)
+                }
             }
         }
     }
@@ -104,7 +135,10 @@ private fun ForecastContent(forecast: ForecastUiModel, modifier: Modifier = Modi
         SectionTitle(text = stringResource(R.string.detail_hourly))
         HourlyForecastRow(items = forecast.hourly)
         SectionTitle(text = stringResource(R.string.detail_daily))
-        Card(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Card(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+        ) {
             forecast.daily.forEachIndexed { index, day ->
                 if (index > 0) HorizontalDivider()
                 DailyForecastItem(day = day)
@@ -122,15 +156,19 @@ private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier =
                 Text(
                     text = forecast.subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Color.White.copy(alpha = 0.8f)
                 )
                 Text(
                     text = "${forecast.conditionEmoji} ${forecast.conditionLabel.asString()}",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
                 )
             }
         }
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -155,7 +193,12 @@ private fun Metric(label: String, value: String) {
 
 @Composable
 private fun SectionTitle(text: String) {
-    Text(text = text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 16.dp))
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        color = Color.White,
+        modifier = Modifier.padding(horizontal = 16.dp)
+    )
 }
 
 @Preview(showBackground = true)
