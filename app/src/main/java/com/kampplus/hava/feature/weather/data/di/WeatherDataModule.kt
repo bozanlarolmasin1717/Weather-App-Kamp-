@@ -4,13 +4,17 @@ import com.kampplus.hava.core.network.di.ForecastRetrofit
 import com.kampplus.hava.core.network.di.GeocodingRetrofit
 import com.kampplus.hava.feature.weather.data.local.CityCatalog
 import com.kampplus.hava.feature.weather.data.local.TurkishCityCatalog
+import com.kampplus.hava.feature.weather.data.remote.CityRemoteDataSource
+import com.kampplus.hava.feature.weather.data.remote.OpenMeteoCityRemoteDataSource
 import com.kampplus.hava.feature.weather.data.remote.OpenMeteoWeatherRemoteDataSource
 import com.kampplus.hava.feature.weather.data.remote.WeatherRemoteDataSource
 import com.kampplus.hava.feature.weather.data.remote.api.OpenMeteoForecastApi
 import com.kampplus.hava.feature.weather.data.remote.api.OpenMeteoGeocodingApi
+import com.kampplus.hava.feature.weather.data.repository.CityRepositoryImpl
 import com.kampplus.hava.feature.weather.data.repository.WeatherRepositoryImpl
 import com.kampplus.hava.feature.weather.domain.policy.WeatherConditionClassifier
 import com.kampplus.hava.feature.weather.domain.policy.WmoWeatherConditionClassifier
+import com.kampplus.hava.feature.weather.domain.repository.CityRepository
 import com.kampplus.hava.feature.weather.domain.repository.WeatherRepository
 import dagger.Binds
 import dagger.Module
@@ -38,6 +42,19 @@ abstract class WeatherDataModule {
         impl:
         OpenMeteoWeatherRemoteDataSource
     ): WeatherRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindCityRepository(
+        impl:
+        CityRepositoryImpl
+    ): CityRepository
+
+    @Binds
+    abstract fun bindCityRemoteDataSource(
+        impl:
+        OpenMeteoCityRemoteDataSource
+    ): CityRemoteDataSource
 
     @Binds
     abstract fun bindCityCatalog(

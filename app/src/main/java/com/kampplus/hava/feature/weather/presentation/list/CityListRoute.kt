@@ -23,6 +23,8 @@ fun CityListRoute(
 
     CityListScreen(
         uiState = uiState,
+        onQueryChange =
+            viewModel::onQueryChange,
         onCityClick = { cityId ->
 
             viewModel
@@ -35,6 +37,8 @@ fun CityListRoute(
             viewModel::onToggleFavorite,
         onRetry =
             viewModel::onRetry,
+        onRefresh =
+            viewModel::onRefresh,
         modifier = modifier
     )
 }

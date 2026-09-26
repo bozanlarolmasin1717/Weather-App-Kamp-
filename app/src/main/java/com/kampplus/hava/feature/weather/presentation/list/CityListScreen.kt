@@ -2,6 +2,7 @@ package com.kampplus.hava.feature.weather.presentation.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import com.kampplus.hava.core.ui.component.ShimmerList
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
 import com.kampplus.hava.core.ui.theme.HavaTheme
+import com.kampplus.hava.feature.weather.presentation.list.component.CitySearchField
 import com.kampplus.hava.feature.weather.presentation.list.component.CityWeatherCard
 import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 
@@ -35,14 +38,16 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 @Composable
 fun CityListScreen(
     uiState:
-    UiState<
-        List<CityWeatherUiModel>
-        >,
+    CityListUiState,
+    onQueryChange:
+        (String) -> Unit,
     onCityClick:
         (Long) -> Unit,
     onFavoriteClick:
         (Long) -> Unit,
     onRetry:
+        () -> Unit,
+    onRefresh:
         () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,57 +66,128 @@ fun CityListScreen(
         }
     ) { innerPadding ->
 
-        Box(
+        Column(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(
                         innerPadding
-                    ),
-            contentAlignment =
-                Alignment.Center
+                    )
         ) {
-            when (uiState) {
 
-                UiState.Loading ->
-                    ShimmerList()
+            CitySearchField(
+                query =
+                    uiState.query,
+                onQueryChange =
+                    onQueryChange,
+                modifier =
+                    Modifier.padding(
+                        horizontal =
+                            16.dp,
+                        vertical =
+                            8.dp
+                    )
+            )
 
-                UiState.Empty ->
-                    EmptyView(
-                        icon =
-                            Icons.Filled.Search,
-                        title =
+            PullToRefreshBox(
+                isRefreshing =
+                    uiState
+                        .isRefreshing,
+                onRefresh =
+                    onRefresh,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+            ) {
+                ListContent(
+                    uiState =
+                        uiState,
+                    onCityClick =
+                        onCityClick,
+                    onFavoriteClick =
+                        onFavoriteClick,
+                    onRetry =
+                        onRetry
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ListContent(
+    uiState:
+    CityListUiState,
+    onCityClick:
+        (Long) -> Unit,
+    onFavoriteClick:
+        (Long) -> Unit,
+    onRetry:
+        () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier =
+            modifier.fillMaxSize(),
+        contentAlignment =
+            Alignment.Center
+    ) {
+        when (
+            val content =
+                uiState.content
+        ) {
+
+            UiState.Loading ->
+                ShimmerList()
+
+            UiState.Empty ->
+                EmptyView(
+                    icon =
+                        Icons.Filled.Search,
+                    title =
+                        stringResource(
+                            R.string
+                                .list_empty_title
+                        ),
+                    message =
+                        if (
+                            uiState
+                                .isSearching
+                        ) {
                             stringResource(
                                 R.string
-                                    .list_empty_title
-                            ),
-                        message =
+                                    .search_empty_message,
+                                uiState
+                                    .query
+                                    .trim()
+                            )
+                        } else {
                             stringResource(
                                 R.string
                                     .list_empty_message
                             )
-                    )
+                        }
+                )
 
-                is UiState.Error ->
-                    ErrorView(
-                        message =
-                            uiState
-                                .message
-                                .asString(),
-                        onRetry =
-                            onRetry
-                    )
+            is UiState.Error ->
+                ErrorView(
+                    message =
+                        content
+                            .message
+                            .asString(),
+                    onRetry =
+                        onRetry
+                )
 
-                is UiState.Success ->
-                    CityList(
-                        items =
-                            uiState.data,
-                        onCityClick =
-                            onCityClick,
-                        onFavoriteClick =
-                            onFavoriteClick
-                    )
-            }
+            is UiState.Success ->
+                CityList(
+                    items =
+                        content.data,
+                    onCityClick =
+                        onCityClick,
+                    onFavoriteClick =
+                        onFavoriteClick
+                )
         }
     }
 }
@@ -166,32 +242,37 @@ private fun CityListScreenPreview() {
     HavaTheme {
         CityListScreen(
             uiState =
-                UiState.Success(
-                    List(5) { index ->
+                CityListUiState(
+                    content =
+                        UiState.Success(
+                            List(5) { index ->
 
-                        CityWeatherUiModel(
-                            cityId =
-                                index.toLong(),
-                            title =
-                                "İstanbul",
-                            subtitle =
-                                "İstanbul, Türkiye",
-                            temperatureText =
-                                "2$index°",
-                            temperatureC =
-                                20.0 + index,
-                            conditionEmoji =
-                                "⛅",
-                            conditionLabel =
-                                UiText.Dynamic(
-                                    "Parçalı bulutlu"
+                                CityWeatherUiModel(
+                                    cityId =
+                                        index.toLong(),
+                                    title =
+                                        "İstanbul",
+                                    subtitle =
+                                        "İstanbul, Türkiye",
+                                    temperatureText =
+                                        "2$index°",
+                                    temperatureC =
+                                        20.0 + index,
+                                    conditionEmoji =
+                                        "⛅",
+                                    conditionLabel =
+                                        UiText.Dynamic(
+                                            "Parçalı bulutlu"
+                                        )
                                 )
+                            }
                         )
-                    }
                 ),
+            onQueryChange = {},
             onCityClick = {},
             onFavoriteClick = {},
-            onRetry = {}
+            onRetry = {},
+            onRefresh = {}
         )
     }
 }

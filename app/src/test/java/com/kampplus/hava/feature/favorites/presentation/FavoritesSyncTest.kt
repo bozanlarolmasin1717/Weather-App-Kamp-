@@ -11,8 +11,10 @@ import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIds
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
+import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.detail.ForecastDetailViewModel
 import com.kampplus.hava.feature.weather.presentation.list.CityListViewModel
+import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.city
@@ -45,8 +47,7 @@ class FavoritesSyncTest {
                 AppResult.Success(
                     listOf(
                         cityWeather(
-                            city =
-                                ankara
+                            city = ankara
                         )
                     )
                 )
@@ -74,45 +75,42 @@ class FavoritesSyncTest {
         )
 
     private val listViewModel by lazy {
-
         CityListViewModel(
-            GetCityWeathersUseCase(
-                weatherRepository
-            ),
-            observeIds,
-            toggle,
-            testUiMapper()
+            getCityWeathers =
+                GetCityWeathersUseCase(
+                    weatherRepository
+                ),
+            searchCityWeathers =
+                SearchCityWeathersUseCase(
+                    FakeCityRepository(),
+                    weatherRepository
+                ),
+            observeFavoriteCityIds =
+                observeIds,
+            toggleFavoriteCity =
+                toggle,
+            uiMapper =
+                testUiMapper()
         )
     }
 
     private val detailViewModel by lazy {
-
         ForecastDetailViewModel(
             savedStateHandle =
                 SavedStateHandle(
                     mapOf(
-                        ForecastDestination
-                            .ARG_CITY_ID to
+                        ForecastDestination.ARG_CITY_ID to
                             ankara.id,
-                        ForecastDestination
-                            .ARG_NAME to
+                        ForecastDestination.ARG_NAME to
                             ankara.name,
-                        ForecastDestination
-                            .ARG_REGION to
+                        ForecastDestination.ARG_REGION to
                             ankara.region,
-                        ForecastDestination
-                            .ARG_COUNTRY to
+                        ForecastDestination.ARG_COUNTRY to
                             ankara.country,
-                        ForecastDestination
-                            .ARG_LATITUDE to
-                            ankara
-                                .coordinates
-                                .latitude,
-                        ForecastDestination
-                            .ARG_LONGITUDE to
-                            ankara
-                                .coordinates
-                                .longitude
+                        ForecastDestination.ARG_LATITUDE to
+                            ankara.coordinates.latitude,
+                        ForecastDestination.ARG_LONGITUDE to
+                            ankara.coordinates.longitude
                     )
                 ),
             getForecast =
@@ -129,7 +127,6 @@ class FavoritesSyncTest {
     }
 
     private val favoritesViewModel by lazy {
-
         FavoritesViewModel(
             ObserveFavoriteCitiesUseCase(
                 favoritesRepository
@@ -141,13 +138,11 @@ class FavoritesSyncTest {
     @Test
     fun `adding from list is reflected on detail and favorites screens`() =
         runTest {
-
             subscribeAll()
 
-            listViewModel
-                .onToggleFavorite(
-                    ankara.id
-                )
+            listViewModel.onToggleFavorite(
+                ankara.id
+            )
 
             runCurrent()
 
@@ -166,26 +161,21 @@ class FavoritesSyncTest {
                 (
                     favoritesViewModel
                         .uiState
-                        .value
-                        as UiState.Success
+                        .value as UiState.Success
                     )
                     .data
-                    .map {
-                        it.id
-                    }
+                    .map { it.id }
             )
         }
 
     @Test
     fun `removing from detail is reflected on list and favorites screens`() =
         runTest {
-
             subscribeAll()
 
-            listViewModel
-                .onToggleFavorite(
-                    ankara.id
-                )
+            listViewModel.onToggleFavorite(
+                ankara.id
+            )
 
             runCurrent()
 
@@ -213,7 +203,6 @@ class FavoritesSyncTest {
     @Test
     fun `undo restores a favorite removed from favorites screen`() =
         runTest {
-
             subscribeAll()
 
             detailViewModel
@@ -230,8 +219,7 @@ class FavoritesSyncTest {
 
             assertEquals(
                 FavoritesEvent.ShowUndo(
-                    cityName =
-                        ankara.name
+                    cityName = ankara.name
                 ),
                 favoritesViewModel
                     .events
@@ -253,7 +241,6 @@ class FavoritesSyncTest {
         }
 
     private fun TestScope.subscribeAll() {
-
         backgroundScope.launch {
             listViewModel
                 .uiState
@@ -280,7 +267,7 @@ class FavoritesSyncTest {
             listViewModel
                 .uiState
                 .value
-                as UiState.Success
+                .content as UiState.Success
             )
             .data
             .single()
@@ -290,8 +277,7 @@ class FavoritesSyncTest {
         (
             detailViewModel
                 .uiState
-                .value
-                as UiState.Success
+                .value as UiState.Success
             )
             .data
             .isFavorite

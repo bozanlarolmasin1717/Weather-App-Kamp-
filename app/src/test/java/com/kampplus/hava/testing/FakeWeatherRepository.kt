@@ -11,21 +11,21 @@ import kotlinx.coroutines.flow.flow
 
 class FakeWeatherRepository(
     var cityWeathersResult:
-        () -> AppResult<
+        () ->
+    AppResult<
         List<CityWeather>
-        > =
-        {
-            AppResult.Success(
-                emptyList()
-            )
-        },
+        > = {
+        AppResult.Success(
+            emptyList()
+        )
+    },
     var forecastResult:
-        (City) -> AppResult<Forecast> =
-        {
-            AppResult.Failure(
-                AppError.NotFound
-            )
-        }
+        (City) ->
+    AppResult<Forecast> = {
+        AppResult.Failure(
+            AppError.NotFound
+        )
+    }
 ) : WeatherRepository {
 
     val requestedForecasts =
@@ -40,6 +40,36 @@ class FakeWeatherRepository(
         flow {
             emit(
                 cityWeathersResult()
+            )
+        }
+
+    var currentWeatherResult:
+            (List<City>) ->
+    AppResult<
+        List<CityWeather>
+        > = { cities ->
+
+        AppResult.Success(
+            cities.map {
+                cityWeather(
+                    city = it
+                )
+            }
+        )
+    }
+
+    override fun getCurrentWeather(
+        cities: List<City>
+    ): Flow<
+        AppResult<
+            List<CityWeather>
+            >
+        > =
+        flow {
+            emit(
+                currentWeatherResult(
+                    cities
+                )
             )
         }
 

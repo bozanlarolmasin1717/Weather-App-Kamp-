@@ -24,6 +24,11 @@ fun ForecastDetailRoute(
         .uiState
         .collectAsStateWithLifecycle()
 
+    val isRefreshing by
+    viewModel
+        .isRefreshing
+        .collectAsStateWithLifecycle()
+
     val context =
         LocalContext.current
 
@@ -39,6 +44,10 @@ fun ForecastDetailRoute(
             viewModel::onToggleFavorite,
         onRetry =
             viewModel::onRetry,
+        onRefresh =
+            viewModel::onRefresh,
+        isRefreshing =
+            isRefreshing,
         modifier = modifier
     )
 }

@@ -21,86 +21,65 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ForecastDetailViewModel @Inject constructor(
-    savedStateHandle:
-    SavedStateHandle,
-    private val getForecast:
-    GetForecastUseCase,
-    observeFavoriteCityIds:
-    ObserveFavoriteCityIdsUseCase,
-    private val toggleFavoriteCity:
-    ToggleFavoriteCityUseCase,
-    private val uiMapper:
-    WeatherUiMapper
+    savedStateHandle: SavedStateHandle,
+    private val getForecast: GetForecastUseCase,
+    observeFavoriteCityIds: ObserveFavoriteCityIdsUseCase,
+    private val toggleFavoriteCity: ToggleFavoriteCityUseCase,
+    private val uiMapper: WeatherUiMapper
 ) : ViewModel() {
 
-    private val city =
-        City(
-            id =
-                checkNotNull(
-                    savedStateHandle[
-                        ForecastDestination
-                            .ARG_CITY_ID
-                    ]
-                ),
-            name =
-                checkNotNull(
-                    savedStateHandle[
-                        ForecastDestination
-                            .ARG_NAME
-                    ]
-                ),
-            region =
+    private val city = City(
+        id = checkNotNull(
+            savedStateHandle[
+                ForecastDestination.ARG_CITY_ID
+            ]
+        ),
+        name = checkNotNull(
+            savedStateHandle[
+                ForecastDestination.ARG_NAME
+            ]
+        ),
+        region = savedStateHandle[
+            ForecastDestination.ARG_REGION
+        ],
+        country = savedStateHandle[
+            ForecastDestination.ARG_COUNTRY
+        ],
+        coordinates = Coordinates(
+            latitude = checkNotNull(
                 savedStateHandle[
-                    ForecastDestination
-                        .ARG_REGION
-                ],
-            country =
+                    ForecastDestination.ARG_LATITUDE
+                ]
+            ),
+            longitude = checkNotNull(
                 savedStateHandle[
-                    ForecastDestination
-                        .ARG_COUNTRY
-                ],
-            coordinates =
-                Coordinates(
-                    latitude =
-                        checkNotNull(
-                            savedStateHandle[
-                                ForecastDestination
-                                    .ARG_LATITUDE
-                            ]
-                        ),
-                    longitude =
-                        checkNotNull(
-                            savedStateHandle[
-                                ForecastDestination
-                                    .ARG_LONGITUDE
-                            ]
-                        )
-                )
+                    ForecastDestination.ARG_LONGITUDE
+                ]
+            )
         )
+    )
 
     private val result =
-        MutableStateFlow<
-            AppResult<Forecast>?
-            >(
-            null
-        )
+        MutableStateFlow<AppResult<Forecast>?>(null)
 
-    val uiState:
-        StateFlow<
-            UiState<ForecastUiModel>
-            > =
+    private val _isRefreshing =
+        MutableStateFlow(false)
+
+    val isRefreshing: StateFlow<Boolean> =
+        _isRefreshing.asStateFlow()
+
+    val uiState: StateFlow<UiState<ForecastUiModel>> =
         combine(
             result,
             observeFavoriteCityIds()
-        ) {
-                result,
-                favoriteIds ->
+        ) { result, favoriteIds ->
 
             when (result) {
 
@@ -113,29 +92,23 @@ class ForecastDetailViewModel @Inject constructor(
                             city,
                             result.data,
                             isFavorite =
-                                city.id in
-                                    favoriteIds
+                                city.id in favoriteIds
                         )
                     )
 
                 is AppResult.Failure ->
                     UiState.Error(
-                        result
-                            .error
-                            .toUiText()
+                        result.error.toUiText()
                     )
             }
         }
             .stateIn(
-                scope =
-                    viewModelScope,
+                scope = viewModelScope,
                 started =
-                    SharingStarted
-                        .WhileSubscribed(
-                            STOP_TIMEOUT_MS
-                        ),
-                initialValue =
-                    UiState.Loading
+                    SharingStarted.WhileSubscribed(
+                        STOP_TIMEOUT_MS
+                    ),
+                initialValue = UiState.Loading
             )
 
     init {
@@ -144,6 +117,17 @@ class ForecastDetailViewModel @Inject constructor(
 
     fun onRetry() =
         load()
+
+    fun onRefresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+
+            result.value =
+                getForecast(city)
+
+            _isRefreshing.value = false
+        }
+    }
 
     fun onToggleFavorite() {
         viewModelScope.launch {
@@ -155,14 +139,9 @@ class ForecastDetailViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-
+            result.value = null
             result.value =
-                null
-
-            result.value =
-                getForecast(
-                    city
-                )
+                getForecast(city)
         }
     }
 

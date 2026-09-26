@@ -10,16 +10,20 @@ import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseC
 import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.CityWeather
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
-import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
+import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.model.WeatherUiMapper
 import com.kampplus.hava.feature.weather.presentation.model.toFavorite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -28,10 +32,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(
+    ExperimentalCoroutinesApi::class,
+    FlowPreview::class
+)
 @HiltViewModel
 class CityListViewModel @Inject constructor(
-    getCityWeathers:
+    private val getCityWeathers:
     GetCityWeathersUseCase,
+    private val searchCityWeathers:
+    SearchCityWeathersUseCase,
     observeFavoriteCityIds:
     ObserveFavoriteCityIdsUseCase,
     private val toggleFavoriteCity:
@@ -44,88 +54,153 @@ class CityListViewModel @Inject constructor(
         Map<Long, City> =
         emptyMap()
 
+    private val query =
+        MutableStateFlow("")
+
     private val reloadTrigger =
         MutableStateFlow(0)
 
-    @OptIn(
-        ExperimentalCoroutinesApi::class
-    )
-    val uiState:
-        StateFlow<
-            UiState<
-                List<CityWeatherUiModel>
-                >
+    private val isRefreshing =
+        MutableStateFlow(false)
+
+    private val results:
+        Flow<
+            AppResult<
+                List<CityWeather>
+                >?
             > =
         combine(
-            reloadTrigger
-                .flatMapLatest {
-
-                    getCityWeathers()
-                        .onEach { result ->
-
-                            if (
-                                result
-                                    is AppResult.Success
-                            ) {
-                                loadedCities =
-                                    result.data
-                                        .associate {
-                                            it.city.id to
-                                                it.city
-                                        }
-                            }
+            query
+                .map {
+                    it.trim()
+                        .takeIf { text ->
+                            text.length >=
+                                MIN_QUERY_LENGTH
                         }
-                        .map<
-                            AppResult<
-                                List<CityWeather>
-                                >,
-                            AppResult<
-                                List<CityWeather>
-                                >?
-                            > {
-                            it
-                        }
-                        .onStart {
-                            emit(null)
-                        }
-                },
-            observeFavoriteCityIds()
-        ) {
-                result,
-                favoriteIds ->
-
-            when (result) {
-
-                null ->
-                    UiState.Loading
-
-                is AppResult.Success ->
+                        .orEmpty()
+                }
+                .debounce {
                     if (
-                        result.data
-                            .isEmpty()
+                        it.isEmpty()
                     ) {
-                        UiState.Empty
+                        0L
                     } else {
-                        UiState.Success(
-                            result.data.map {
-                                uiMapper
-                                    .toListItem(
-                                        it,
-                                        isFavorite =
-                                            it.city.id in
-                                                favoriteIds
-                                    )
-                            }
+                        SEARCH_DEBOUNCE_MS
+                    }
+                }
+                .distinctUntilChanged(),
+            reloadTrigger
+        ) {
+                searchText,
+                _ ->
+
+            searchText
+        }
+            .flatMapLatest {
+                    searchText ->
+
+                val source =
+                    if (
+                        searchText.isEmpty()
+                    ) {
+                        getCityWeathers()
+                    } else {
+                        searchCityWeathers(
+                            searchText
                         )
                     }
 
-                is AppResult.Failure ->
-                    UiState.Error(
-                        result
-                            .error
-                            .toUiText()
-                    )
+                source
+                    .onEach { result ->
+
+                        if (
+                            result
+                                is AppResult.Success
+                        ) {
+                            loadedCities =
+                                result.data
+                                    .associate {
+                                        it.city.id to
+                                            it.city
+                                    }
+                        }
+
+                        isRefreshing.value =
+                            false
+                    }
+                    .map<
+                        AppResult<
+                            List<CityWeather>
+                            >,
+                        AppResult<
+                            List<CityWeather>
+                            >?
+                        > {
+                        it
+                    }
+                    .onStart {
+
+                        if (
+                            !isRefreshing.value
+                        ) {
+                            emit(null)
+                        }
+                    }
             }
+
+    val uiState:
+        StateFlow<
+            CityListUiState
+            > =
+        combine(
+            query,
+            results,
+            observeFavoriteCityIds(),
+            isRefreshing
+        ) {
+                query,
+                result,
+                favoriteIds,
+                refreshing ->
+
+            CityListUiState(
+                query = query,
+                content =
+                    when (result) {
+
+                        null ->
+                            UiState.Loading
+
+                        is AppResult.Success ->
+                            if (
+                                result.data
+                                    .isEmpty()
+                            ) {
+                                UiState.Empty
+                            } else {
+                                UiState.Success(
+                                    result.data.map {
+                                        uiMapper
+                                            .toListItem(
+                                                it,
+                                                isFavorite =
+                                                    it.city.id in
+                                                        favoriteIds
+                                            )
+                                    }
+                                )
+                            }
+
+                        is AppResult.Failure ->
+                            UiState.Error(
+                                result
+                                    .error
+                                    .toUiText()
+                            )
+                    },
+                isRefreshing =
+                    refreshing
+            )
         }
             .stateIn(
                 scope =
@@ -136,7 +211,7 @@ class CityListViewModel @Inject constructor(
                             STOP_TIMEOUT_MS
                         ),
                 initialValue =
-                    UiState.Loading
+                    CityListUiState()
             )
 
     fun findCity(
@@ -144,7 +219,23 @@ class CityListViewModel @Inject constructor(
     ): City? =
         loadedCities[cityId]
 
+    fun onQueryChange(
+        text: String
+    ) {
+        query.value =
+            text
+    }
+
     fun onRetry() {
+        reloadTrigger.update {
+            it + 1
+        }
+    }
+
+    fun onRefresh() {
+        isRefreshing.value =
+            true
+
         reloadTrigger.update {
             it + 1
         }
@@ -164,8 +255,15 @@ class CityListViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val STOP_TIMEOUT_MS =
+    companion object {
+
+        const val MIN_QUERY_LENGTH =
+            2
+
+        const val SEARCH_DEBOUNCE_MS =
+            400L
+
+        private const val STOP_TIMEOUT_MS =
             5_000L
     }
 }
