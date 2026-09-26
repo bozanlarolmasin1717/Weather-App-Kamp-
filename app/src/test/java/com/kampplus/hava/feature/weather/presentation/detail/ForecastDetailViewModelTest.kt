@@ -1,17 +1,27 @@
 package com.kampplus.hava.feature.weather.presentation.detail
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
 import com.kampplus.hava.R
 import com.kampplus.hava.core.common.error.AppError
 import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.navigation.ForecastDestination
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
+import com.kampplus.hava.feature.favorites.data.local.InMemoryFavoriteCityDataSource
+import com.kampplus.hava.feature.favorites.data.repository.FavoriteCityRepositoryImpl
+import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
+import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.forecast
 import com.kampplus.hava.testing.testUiMapper
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
 
 class ForecastDetailViewModelTest {
 
@@ -22,6 +32,11 @@ class ForecastDetailViewModelTest {
     private val repository =
         FakeWeatherRepository()
 
+    private val favoritesRepository =
+        FavoriteCityRepositoryImpl(
+            InMemoryFavoriteCityDataSource()
+        )
+
     private fun createViewModel() =
         ForecastDetailViewModel(
             savedStateHandle =
@@ -29,27 +44,35 @@ class ForecastDetailViewModelTest {
                     mapOf(
                         ForecastDestination
                             .ARG_CITY_ID to
-                                311046L,
+                            311046L,
                         ForecastDestination
                             .ARG_NAME to
-                                "İzmir",
+                            "İzmir",
                         ForecastDestination
                             .ARG_REGION to
-                                "İzmir",
+                            "İzmir",
                         ForecastDestination
                             .ARG_COUNTRY to
-                                "Türkiye",
+                            "Türkiye",
                         ForecastDestination
                             .ARG_LATITUDE to
-                                38.4127,
+                            38.4127,
                         ForecastDestination
                             .ARG_LONGITUDE to
-                                27.1384
+                            27.1384
                     )
                 ),
             getForecast =
                 GetForecastUseCase(
                     repository
+                ),
+            observeFavoriteCityIds =
+                ObserveFavoriteCityIdsUseCase(
+                    favoritesRepository
+                ),
+            toggleFavoriteCity =
+                ToggleFavoriteCityUseCase(
+                    favoritesRepository
                 ),
             uiMapper =
                 testUiMapper()
