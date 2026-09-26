@@ -1,7 +1,7 @@
 package com.kampplus.hava.feature.favorites.data.di
 
 import com.kampplus.hava.feature.favorites.data.local.FavoriteCityLocalDataSource
-import com.kampplus.hava.feature.favorites.data.local.InMemoryFavoriteCityDataSource
+import com.kampplus.hava.feature.favorites.data.local.RoomFavoriteCityDataSource
 import com.kampplus.hava.feature.favorites.data.repository.FavoriteCityRepositoryImpl
 import com.kampplus.hava.feature.favorites.domain.repository.FavoriteCityRepository
 import dagger.Binds
@@ -16,5 +16,5 @@ abstract class FavoritesDataModule {
     abstract fun bindFavoriteCityRepository(impl: FavoriteCityRepositoryImpl): FavoriteCityRepository
 
     @Binds
-    abstract fun bindFavoriteCityLocalDataSource(impl: InMemoryFavoriteCityDataSource): FavoriteCityLocalDataSource
+    abstract fun bindFavoriteCityLocalDataSource(impl: RoomFavoriteCityDataSource): FavoriteCityLocalDataSource
 }

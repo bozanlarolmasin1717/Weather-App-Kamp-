@@ -19,6 +19,12 @@ class FakeWeatherRepository(
 
     override fun getCityWeathers(): Flow<AppResult<List<CityWeather>>> = flow { emit(cityWeathersResult()) }
 
+    var currentWeatherResult: (List<City>) -> AppResult<List<CityWeather>> = { cities ->
+        AppResult.Success(cities.map { cityWeather(city = it) })
+    }
+
+    override fun getCurrentWeather(cities: List<City>): Flow<AppResult<List<CityWeather>>> = flow { emit(currentWeatherResult(cities)) }
+
     override suspend fun getForecast(city: City): AppResult<Forecast> {
         requestedForecasts += city
         return forecastResult(city)

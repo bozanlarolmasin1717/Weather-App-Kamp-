@@ -14,12 +14,16 @@ import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 @Composable
 fun ForecastDetailRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: ForecastDetailViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val context = LocalContext.current
     ForecastDetailScreen(
         uiState = uiState,
         onBack = onBack,
         onShare = { forecast -> context.shareForecast(forecast) },
         onFavoriteClick = viewModel::onToggleFavorite,
+        onRetry = viewModel::onRetry,
+        onRefresh = viewModel::onRefresh,
+        isRefreshing = isRefreshing,
         modifier = modifier
     )
 }

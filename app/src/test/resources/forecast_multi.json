@@ -1,0 +1,4 @@
+[
+  { "latitude": 41.0, "longitude": 28.9375, "current": { "time": "2026-09-24T11:30", "temperature_2m": 18.4, "weather_code": 3, "is_day": 1 } },
+  { "latitude": 39.9375, "longitude": 32.875, "current": { "time": "2026-09-24T11:30", "temperature_2m": 14.5, "weather_code": 2, "is_day": 1 } }
+]

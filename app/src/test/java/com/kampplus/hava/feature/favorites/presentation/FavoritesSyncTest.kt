@@ -11,8 +11,10 @@ import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIds
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
+import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.detail.ForecastDetailViewModel
 import com.kampplus.hava.feature.weather.presentation.list.CityListViewModel
+import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.city
@@ -47,7 +49,13 @@ class FavoritesSyncTest {
 
     // Lazy: ViewModel'ler MainDispatcherRule, Main dispatcher'ı değiştirdikten sonra oluşturulmalı.
     private val listViewModel by lazy {
-        CityListViewModel(GetCityWeathersUseCase(weatherRepository), observeIds, toggle, testUiMapper())
+        CityListViewModel(
+            getCityWeathers = GetCityWeathersUseCase(weatherRepository),
+            searchCityWeathers = SearchCityWeathersUseCase(FakeCityRepository(), weatherRepository),
+            observeFavoriteCityIds = observeIds,
+            toggleFavoriteCity = toggle,
+            uiMapper = testUiMapper()
+        )
     }
     private val detailViewModel by lazy {
         ForecastDetailViewModel(
@@ -122,7 +130,7 @@ class FavoritesSyncTest {
         runCurrent()
     }
 
-    private fun listIsFavorite() = (listViewModel.uiState.value as UiState.Success).data.single().isFavorite
+    private fun listIsFavorite() = (listViewModel.uiState.value.content as UiState.Success).data.single().isFavorite
 
     private fun detailIsFavorite() = (detailViewModel.uiState.value as UiState.Success).data.isFavorite
 }

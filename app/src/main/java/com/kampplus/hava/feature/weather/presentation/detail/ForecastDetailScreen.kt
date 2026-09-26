@@ -1,7 +1,6 @@
 package com.kampplus.hava.feature.weather.presentation.detail
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
+import com.kampplus.hava.core.ui.component.ErrorView
 import com.kampplus.hava.core.ui.component.FavoriteToggleButton
+import com.kampplus.hava.core.ui.component.LoadingView
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
@@ -48,7 +49,10 @@ fun ForecastDetailScreen(
     onBack: () -> Unit,
     onShare: (ForecastUiModel) -> Unit,
     onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    isRefreshing: Boolean = false
 ) {
     Scaffold(
         modifier = modifier,
@@ -69,16 +73,18 @@ fun ForecastDetailScreen(
             )
         }
     ) { innerPadding ->
-        Box(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
             when (uiState) {
-                UiState.Loading -> CircularProgressIndicator()
-                UiState.Empty -> Text(stringResource(R.string.empty_generic))
-                is UiState.Error -> Text(uiState.message.asString())
+                UiState.Loading -> LoadingView()
+                UiState.Empty -> ErrorView(message = stringResource(R.string.error_not_found))
+                is UiState.Error -> ErrorView(message = uiState.message.asString(), onRetry = onRetry)
                 is UiState.Success -> ForecastContent(forecast = uiState.data)
             }
         }
@@ -175,7 +181,9 @@ private fun ForecastDetailScreenPreview() {
             ),
             onBack = {},
             onShare = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
+            onRetry = {},
+            onRefresh = {}
         )
     }
 }
