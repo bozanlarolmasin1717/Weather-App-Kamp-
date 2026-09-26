@@ -14,7 +14,13 @@ fun city(
     id: Long = 323786,
     name: String = "Ankara",
     region: String? = "Ankara",
-    country: String? = "Türkiye"
+    country: String? = "Türkiye",
+    coordinates:
+    Coordinates =
+        Coordinates(
+            39.92,
+            32.85
+        )
 ) =
     City(
         id = id,
@@ -22,10 +28,7 @@ fun city(
         region = region,
         country = country,
         coordinates =
-            Coordinates(
-                39.92,
-                32.85
-            )
+            coordinates
     )
 
 fun cityWeather(
