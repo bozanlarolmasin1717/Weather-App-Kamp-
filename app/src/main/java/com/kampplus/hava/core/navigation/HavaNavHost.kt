@@ -5,13 +5,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.kampplus.hava.feature.favorites.presentation.FavoritesRoute
 import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.presentation.detail.ForecastDetailRoute
 import com.kampplus.hava.feature.weather.presentation.list.CityListRoute
+import com.kampplus.hava.feature.weather.presentation.model.toCity
 
 @Composable
-fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()) {
+fun HavaNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     val openForecast: (City) -> Unit = { city -> navController.navigate(city.toDestination()) }
     NavHost(
         navController = navController,
@@ -20,6 +21,9 @@ fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController 
     ) {
         composable<ListDestination> {
             CityListRoute(onCityClick = openForecast)
+        }
+        composable<FavoritesDestination> {
+            FavoritesRoute(onCityClick = { favorite -> openForecast(favorite.toCity()) })
         }
         composable<ForecastDestination> {
             ForecastDetailRoute(onBack = navController::navigateUp)

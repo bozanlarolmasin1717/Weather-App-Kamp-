@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 data object ListDestination
 
 @Serializable
+data object FavoritesDestination
+
+@Serializable
 data class ForecastDestination(
     val cityId: Long,
     val name: String,

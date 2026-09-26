@@ -13,6 +13,7 @@ fun CityListRoute(onCityClick: (City) -> Unit, modifier: Modifier = Modifier, vi
     CityListScreen(
         uiState = uiState,
         onCityClick = { cityId -> viewModel.findCity(cityId)?.let(onCityClick) },
+        onFavoriteClick = viewModel::onToggleFavorite,
         modifier = modifier
     )
 }

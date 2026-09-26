@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
+import com.kampplus.hava.core.ui.component.FavoriteToggleButton
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
@@ -46,6 +47,7 @@ fun ForecastDetailScreen(
     uiState: UiState<ForecastUiModel>,
     onBack: () -> Unit,
     onShare: (ForecastUiModel) -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -60,6 +62,7 @@ fun ForecastDetailScreen(
                 },
                 actions = {
                     if (uiState is UiState.Success) {
+                        FavoriteToggleButton(isFavorite = uiState.data.isFavorite, onClick = onFavoriteClick)
                         ShareButton(onClick = { onShare(uiState.data) })
                     }
                 }
@@ -171,7 +174,8 @@ private fun ForecastDetailScreenPreview() {
                 )
             ),
             onBack = {},
-            onShare = {}
+            onShare = {},
+            onFavoriteClick = {}
         )
     }
 }

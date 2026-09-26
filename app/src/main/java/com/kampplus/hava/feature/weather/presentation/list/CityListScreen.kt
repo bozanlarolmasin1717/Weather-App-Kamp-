@@ -27,7 +27,12 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CityListScreen(uiState: UiState<List<CityWeatherUiModel>>, onCityClick: (Long) -> Unit, modifier: Modifier = Modifier) {
+fun CityListScreen(
+    uiState: UiState<List<CityWeatherUiModel>>,
+    onCityClick: (Long) -> Unit,
+    onFavoriteClick: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         modifier = modifier,
         topBar = { TopAppBar(title = { Text(stringResource(R.string.list_title)) }) }
@@ -42,21 +47,30 @@ fun CityListScreen(uiState: UiState<List<CityWeatherUiModel>>, onCityClick: (Lon
                 UiState.Loading -> CircularProgressIndicator()
                 UiState.Empty -> Text(stringResource(R.string.empty_generic))
                 is UiState.Error -> Text(uiState.message.asString())
-                is UiState.Success -> CityList(items = uiState.data, onCityClick = onCityClick)
+                is UiState.Success -> CityList(items = uiState.data, onCityClick = onCityClick, onFavoriteClick = onFavoriteClick)
             }
         }
     }
 }
 
 @Composable
-private fun CityList(items: List<CityWeatherUiModel>, onCityClick: (Long) -> Unit, modifier: Modifier = Modifier) {
+private fun CityList(
+    items: List<CityWeatherUiModel>,
+    onCityClick: (Long) -> Unit,
+    onFavoriteClick: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(items = items, key = { it.cityId }) { item ->
-            CityWeatherCard(item = item, onClick = { onCityClick(item.cityId) })
+            CityWeatherCard(
+                item = item,
+                onClick = { onCityClick(item.cityId) },
+                onFavoriteClick = { onFavoriteClick(item.cityId) }
+            )
         }
     }
 }
@@ -79,7 +93,8 @@ private fun CityListScreenPreview() {
                     )
                 }
             ),
-            onCityClick = {}
+            onCityClick = {},
+            onFavoriteClick = {}
         )
     }
 }
