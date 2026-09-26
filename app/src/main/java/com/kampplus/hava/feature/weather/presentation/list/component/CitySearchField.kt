@@ -1,6 +1,7 @@
 package com.kampplus.hava.feature.weather.presentation.list.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -8,10 +9,12 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -20,10 +23,26 @@ import com.kampplus.hava.R
 @Composable
 fun CitySearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
     val focusManager = LocalFocusManager.current
-    OutlinedTextField(
+    TextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier.fillMaxWidth(),
+        shape = CircleShape,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White.copy(alpha = 0.22f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.14f),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedPlaceholderColor = Color.White.copy(alpha = 0.7f),
+            unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
+            focusedLeadingIconColor = Color.White,
+            unfocusedLeadingIconColor = Color.White.copy(alpha = 0.75f),
+            focusedTrailingIconColor = Color.White,
+            unfocusedTrailingIconColor = Color.White.copy(alpha = 0.75f),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
         placeholder = { Text(stringResource(R.string.search_hint)) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         trailingIcon = {

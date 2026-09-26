@@ -20,10 +20,16 @@ fun HavaNavHost(navController: NavHostController, modifier: Modifier = Modifier)
         modifier = modifier
     ) {
         composable<ListDestination> {
-            CityListRoute(onCityClick = openForecast)
+            CityListRoute(
+                onCityClick = openForecast,
+                onFavoritesClick = { navController.navigate(FavoritesDestination) }
+            )
         }
         composable<FavoritesDestination> {
-            FavoritesRoute(onCityClick = { favorite -> openForecast(favorite.toCity()) })
+            FavoritesRoute(
+                onBack = navController::navigateUp,
+                onCityClick = { favorite -> openForecast(favorite.toCity()) }
+            )
         }
         composable<ForecastDestination> {
             ForecastDetailRoute(onBack = navController::navigateUp)

@@ -22,8 +22,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -32,13 +35,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +65,8 @@ import com.kampplus.hava.feature.weather.presentation.list.component.CitySearchF
 import com.kampplus.hava.feature.weather.presentation.list.component.CityWeatherHeroCard
 import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 import com.kampplus.hava.feature.weather.presentation.model.weatherGradientColors
+import com.kampplus.hava.feature.weather.presentation.outfit.WeatherAssistantAvatar
+import com.kampplus.hava.feature.weather.presentation.sound.WeatherSoundManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,39 +78,117 @@ fun CityListScreen(
     onFavoriteClick: (Long) -> Unit,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFavoritesClick: () -> Unit = {}
 ) {
-    Scaffold(
-        modifier = modifier,
-        containerColor = Color.Transparent,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.list_title), color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
+    val context = LocalContext.current
+    val soundManager = remember { WeatherSoundManager(context) }
+    var isSoundEnabled by remember { mutableStateOf(soundManager.isEnabled) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            soundManager.release()
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            CitySearchField(
-                query = uiState.query,
-                onQueryChange = onQueryChange,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-            )
-            PullToRefreshBox(
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = onRefresh,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                ListContent(
-                    uiState = uiState,
-                    onCityClick = onCityClick,
-                    onFavoriteClick = onFavoriteClick,
-                    onRetry = onRetry
+    }
+
+    val currentItems = (uiState.content as? UiState.Success)?.data.orEmpty()
+    val initialCondition = currentItems.firstOrNull()?.condition ?: WeatherCondition.Unknown
+    var activeCondition by remember { mutableStateOf(initialCondition) }
+
+    LaunchedEffect(currentItems) {
+        if (currentItems.isNotEmpty() && activeCondition == WeatherCondition.Unknown) {
+            activeCondition = currentItems.first().condition
+        }
+    }
+
+    LaunchedEffect(activeCondition, isSoundEnabled) {
+        if (isSoundEnabled) {
+            soundManager.play(activeCondition)
+        } else {
+            soundManager.stop()
+        }
+    }
+
+    val targetColors = weatherGradientColors(activeCondition)
+    val topColor by animateColorAsState(
+        targetValue = targetColors.topColor,
+        animationSpec = tween(durationMillis = 600),
+        label = "bgTopColor"
+    )
+    val bottomColor by animateColorAsState(
+        targetValue = targetColors.bottomColor,
+        animationSpec = tween(durationMillis = 600),
+        label = "bgBottomColor"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(listOf(topColor, bottomColor)))
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.list_title),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        )
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                isSoundEnabled = soundManager.toggleSound(activeCondition)
+                            }
+                        ) {
+                            Text(
+                                text = if (isSoundEnabled) "🔊" else "🔇",
+                                fontSize = 20.sp
+                            )
+                        }
+
+                        IconButton(onClick = onFavoritesClick) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Favori Şehirler",
+                                tint = Color(0xFFEF4444)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                CitySearchField(
+                    query = uiState.query,
+                    onQueryChange = onQueryChange,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ListContent(
+                        uiState = uiState,
+                        onCityClick = onCityClick,
+                        onFavoriteClick = onFavoriteClick,
+                        onRetry = onRetry,
+                        onPageChange = { condition ->
+                            activeCondition = condition
+                        }
+                    )
+                }
             }
         }
     }
@@ -111,6 +200,7 @@ private fun ListContent(
     onCityClick: (Long) -> Unit,
     onFavoriteClick: (Long) -> Unit,
     onRetry: () -> Unit,
+    onPageChange: (WeatherCondition) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -129,7 +219,8 @@ private fun ListContent(
             is UiState.Success -> CityPagerContent(
                 items = content.data,
                 onCityClick = onCityClick,
-                onFavoriteClick = onFavoriteClick
+                onFavoriteClick = onFavoriteClick,
+                onPageChange = onPageChange
             )
         }
     }
@@ -140,35 +231,24 @@ private fun CityPagerContent(
     items: List<CityWeatherUiModel>,
     onCityClick: (Long) -> Unit,
     onFavoriteClick: (Long) -> Unit,
+    onPageChange: (WeatherCondition) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(pageCount = { items.size })
     val coroutineScope = rememberCoroutineScope()
 
     val currentItem = items.getOrNull(pagerState.currentPage)
-    val currentCondition = currentItem?.condition ?: WeatherCondition.Unknown
-    val targetColors = weatherGradientColors(currentCondition)
 
-    val topColor by animateColorAsState(
-        targetValue = targetColors.topColor,
-        animationSpec = tween(durationMillis = 600),
-        label = "bgTopColor"
-    )
-    val bottomColor by animateColorAsState(
-        targetValue = targetColors.bottomColor,
-        animationSpec = tween(durationMillis = 600),
-        label = "bgBottomColor"
-    )
+    LaunchedEffect(pagerState.currentPage, items) {
+        val condition = currentItem?.condition ?: WeatherCondition.Unknown
+        onPageChange(condition)
+    }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(topColor, bottomColor)))
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -193,7 +273,7 @@ private fun CityPagerContent(
                 if (currentItem?.isFavorite == true) {
                     Surface(
                         shape = CircleShape,
-                        color = Color.Red.copy(alpha = 0.25f)
+                        color = Color(0x33EF4444)
                     ) {
                         Text(
                             text = "❤️ Favori",
@@ -207,7 +287,7 @@ private fun CityPagerContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             HorizontalPager(
                 state = pagerState,
@@ -225,7 +305,7 @@ private fun CityPagerContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -249,7 +329,7 @@ private fun CityPagerContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -287,6 +367,14 @@ private fun CityPagerContent(
                 }
             }
         }
+
+        currentItem?.let { item ->
+            WeatherAssistantAvatar(
+                condition = item.condition,
+                temperatureC = item.temperatureC,
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
+        }
     }
 }
 
@@ -314,7 +402,8 @@ private fun CityListScreenPreview() {
             onCityClick = {},
             onFavoriteClick = {},
             onRetry = {},
-            onRefresh = {}
+            onRefresh = {},
+            onFavoritesClick = {}
         )
     }
 }

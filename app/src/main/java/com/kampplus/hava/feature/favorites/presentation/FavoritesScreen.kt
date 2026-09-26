@@ -1,5 +1,6 @@
 package com.kampplus.hava.feature.favorites.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,17 +9,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
@@ -35,38 +42,63 @@ fun FavoritesScreen(
     onCityClick: (Long) -> Unit,
     onRemoveFavorite: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.favorites_title)) }) }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when (uiState) {
-                UiState.Loading -> LoadingView()
-                UiState.Empty -> EmptyView(
-                    icon = Icons.Filled.FavoriteBorder,
-                    title = stringResource(R.string.favorites_empty_title),
-                    message = stringResource(R.string.favorites_empty_message)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF1E293B), Color(0xFF0F172A))
                 )
-                is UiState.Error -> ErrorView(message = uiState.message.asString())
-                is UiState.Success -> LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(items = uiState.data, key = { it.id }) { item ->
-                        FavoriteCityCard(
-                            item = item,
-                            onClick = { onCityClick(item.id) },
-                            onRemoveClick = { onRemoveFavorite(item.id) }
-                        )
+            )
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.favorites_title), color = Color.White) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.action_back),
+                                tint = Color.White
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                when (uiState) {
+                    UiState.Loading -> LoadingView()
+                    UiState.Empty -> EmptyView(
+                        icon = Icons.Filled.FavoriteBorder,
+                        title = stringResource(R.string.favorites_empty_title),
+                        message = stringResource(R.string.favorites_empty_message)
+                    )
+                    is UiState.Error -> ErrorView(message = uiState.message.asString())
+                    is UiState.Success -> LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(items = uiState.data, key = { it.id }) { item ->
+                            FavoriteCityCard(
+                                item = item,
+                                onClick = { onCityClick(item.id) },
+                                onRemoveClick = { onRemoveFavorite(item.id) }
+                            )
+                        }
                     }
                 }
             }
