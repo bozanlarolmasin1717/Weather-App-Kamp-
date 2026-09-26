@@ -20,31 +20,10 @@ class FakeWeatherRemoteDataSource @Inject constructor() :
 
         delay(FAKE_LATENCY_MS)
 
-        return cities.mapIndexed { index, city ->
-
+        return cities.map { city ->
             CityWeather(
                 city = city,
-                current = CurrentWeather(
-                    temperatureC =
-                        TEMPERATURES[
-                            index % TEMPERATURES.size
-                        ],
-                    weatherCode =
-                        WeatherCode(
-                            CODES[
-                                index % CODES.size
-                            ]
-                        ),
-                    observedAt = OBSERVED_AT,
-                    apparentTemperatureC =
-                        TEMPERATURES[
-                            index % TEMPERATURES.size
-                        ] - 1.5,
-                    humidityPercent =
-                        40 + (index * 3) % 50,
-                    windSpeedKmh =
-                        5.0 + index % 15
-                )
+                current = currentFor(city)
             )
         }
     }
@@ -55,56 +34,41 @@ class FakeWeatherRemoteDataSource @Inject constructor() :
 
         delay(FAKE_LATENCY_MS)
 
-        val base =
-            TEMPERATURES[
-                (city.id % TEMPERATURES.size)
-                    .toInt()
-            ]
-
-        val current =
-            CurrentWeather(
-                temperatureC = base,
-                weatherCode =
-                    WeatherCode(
-                        CODES[
-                            (city.id % CODES.size)
-                                .toInt()
-                        ]
-                    ),
-                observedAt = OBSERVED_AT,
-                apparentTemperatureC =
-                    base - 1.5,
-                humidityPercent = 55,
-                windSpeedKmh = 12.0
-            )
+        val current = currentFor(city)
+        val slot = slotOf(city)
 
         val hourly =
             List(HOURS) { hour ->
 
+                val time =
+                    OBSERVED_AT.plusHours(
+                        hour.toLong()
+                    )
+
                 HourlyForecast(
-                    time =
-                        OBSERVED_AT.plusHours(
-                            hour.toLong()
-                        ),
+                    time = time,
                     temperatureC =
-                        base +
+                        current.temperatureC +
                             DAILY_CURVE[
-                                (
-                                    OBSERVED_AT.hour +
-                                        hour
-                                    ) %
-                                    DAILY_CURVE.size
+                                time.hour
+                            ] -
+                            DAILY_CURVE[
+                                OBSERVED_AT.hour
                             ],
                     weatherCode =
-                        WeatherCode(
-                            CODES[
-                                (
-                                    hour +
-                                        city.id.toInt()
-                                    ) %
-                                    CODES.size
-                            ]
-                        ),
+                        if (hour == 0) {
+                            current.weatherCode
+                        } else {
+                            WeatherCode(
+                                CODES[
+                                    (
+                                        slot +
+                                            hour
+                                        ) %
+                                        CODES.size
+                                ]
+                            )
+                        },
                     precipitationProbability =
                         (hour * 7) % 60
                 )
@@ -121,19 +85,27 @@ class FakeWeatherRemoteDataSource @Inject constructor() :
                                 day.toLong()
                             ),
                     minTemperatureC =
-                        base - 6 + day % 3,
+                        current.temperatureC -
+                            7 +
+                            day % 3,
                     maxTemperatureC =
-                        base + 3 - day % 2,
+                        current.temperatureC +
+                            2 -
+                            day % 2,
                     weatherCode =
-                        WeatherCode(
-                            CODES[
-                                (
-                                    day * 3 +
-                                        city.id.toInt()
-                                    ) %
-                                    CODES.size
-                            ]
-                        ),
+                        if (day == 0) {
+                            current.weatherCode
+                        } else {
+                            WeatherCode(
+                                CODES[
+                                    (
+                                        slot +
+                                            day * 3
+                                        ) %
+                                        CODES.size
+                                ]
+                            )
+                        },
                     precipitationProbability =
                         (day * 13) % 80
                 )
@@ -146,11 +118,61 @@ class FakeWeatherRemoteDataSource @Inject constructor() :
         )
     }
 
+    private fun currentFor(
+        city: City
+    ): CurrentWeather {
+
+        val slot = slotOf(city)
+
+        val temperature =
+            TEMPERATURES[
+                slot %
+                    TEMPERATURES.size
+            ]
+
+        return CurrentWeather(
+            temperatureC =
+                temperature,
+            weatherCode =
+                WeatherCode(
+                    CODES[
+                        slot %
+                            CODES.size
+                    ]
+                ),
+            observedAt =
+                OBSERVED_AT,
+            apparentTemperatureC =
+                temperature - 1.5,
+            humidityPercent =
+                40 + (slot * 3) % 50,
+            windSpeedKmh =
+                5.0 + slot % 15
+        )
+    }
+
+    private fun slotOf(
+        city: City
+    ): Int =
+        (
+            city.id %
+                TEMPERATURES.size
+            )
+            .toInt()
+            .let {
+                if (it < 0) {
+                    -it
+                } else {
+                    it
+                }
+            }
+
     private companion object {
 
         const val HOURS = 24
         const val DAYS = 7
-        const val FAKE_LATENCY_MS = 300L
+        const val FAKE_LATENCY_MS =
+            300L
 
         val OBSERVED_AT:
             LocalDateTime =
