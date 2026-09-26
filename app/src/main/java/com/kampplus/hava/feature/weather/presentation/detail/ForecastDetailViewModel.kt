@@ -8,16 +8,22 @@ import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.navigation.ForecastDestination
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
+import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
+import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.Coordinates
+import com.kampplus.hava.feature.weather.domain.model.Forecast
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
 import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 import com.kampplus.hava.feature.weather.presentation.model.WeatherUiMapper
+import com.kampplus.hava.feature.weather.presentation.model.toFavorite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -26,6 +32,10 @@ class ForecastDetailViewModel @Inject constructor(
     SavedStateHandle,
     private val getForecast:
     GetForecastUseCase,
+    observeFavoriteCityIds:
+    ObserveFavoriteCityIdsUseCase,
+    private val toggleFavoriteCity:
+    ToggleFavoriteCityUseCase,
     private val uiMapper:
     WeatherUiMapper
 ) : ViewModel() {
@@ -75,51 +85,85 @@ class ForecastDetailViewModel @Inject constructor(
                 )
         )
 
-    private val _uiState =
+    private val result =
         MutableStateFlow<
-            UiState<ForecastUiModel>
+            AppResult<Forecast>?
             >(
-            UiState.Loading
+            null
         )
 
     val uiState:
         StateFlow<
             UiState<ForecastUiModel>
             > =
-        _uiState.asStateFlow()
+        combine(
+            result,
+            observeFavoriteCityIds()
+        ) {
+                result,
+                favoriteIds ->
+
+            when (result) {
+
+                null ->
+                    UiState.Loading
+
+                is AppResult.Success ->
+                    UiState.Success(
+                        uiMapper.toForecast(
+                            city,
+                            result.data,
+                            isFavorite =
+                                city.id in
+                                    favoriteIds
+                        )
+                    )
+
+                is AppResult.Failure ->
+                    UiState.Error(
+                        UiText.Resource(
+                            R.string.error_generic
+                        )
+                    )
+            }
+        }
+            .stateIn(
+                scope =
+                    viewModelScope,
+                started =
+                    SharingStarted
+                        .WhileSubscribed(
+                            STOP_TIMEOUT_MS
+                        ),
+                initialValue =
+                    UiState.Loading
+            )
 
     init {
         load()
     }
 
-    private fun load() {
+    fun onToggleFavorite() {
+        viewModelScope.launch {
+            toggleFavoriteCity(
+                city.toFavorite()
+            )
+        }
+    }
 
+    private fun load() {
         viewModelScope.launch {
 
-            _uiState.value =
-                UiState.Loading
+            result.value =
+                null
 
-            _uiState.value =
-                when (
-                    val result =
-                        getForecast(city)
-                ) {
-
-                    is AppResult.Success ->
-                        UiState.Success(
-                            uiMapper.toForecast(
-                                city,
-                                result.data
-                            )
-                        )
-
-                    is AppResult.Failure ->
-                        UiState.Error(
-                            UiText.Resource(
-                                R.string.error_generic
-                            )
-                        )
-                }
+            result.value =
+                getForecast(city)
         }
+    }
+
+    private companion object {
+        const val STOP_TIMEOUT_MS =
+            5_000L
     }
 }

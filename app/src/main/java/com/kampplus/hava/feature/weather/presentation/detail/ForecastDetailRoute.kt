@@ -35,6 +35,8 @@ fun ForecastDetailRoute(
                 forecast
             )
         },
+        onFavoriteClick =
+            viewModel::onToggleFavorite,
         modifier = modifier
     )
 }

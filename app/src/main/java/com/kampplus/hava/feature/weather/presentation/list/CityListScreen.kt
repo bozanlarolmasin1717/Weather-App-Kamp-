@@ -36,6 +36,8 @@ fun CityListScreen(
         >,
     onCityClick:
         (Long) -> Unit,
+    onFavoriteClick:
+        (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -87,7 +89,9 @@ fun CityListScreen(
                         items =
                             uiState.data,
                         onCityClick =
-                            onCityClick
+                            onCityClick,
+                        onFavoriteClick =
+                            onFavoriteClick
                     )
             }
         }
@@ -99,6 +103,8 @@ private fun CityList(
     items:
     List<CityWeatherUiModel>,
     onCityClick:
+        (Long) -> Unit,
+    onFavoriteClick:
         (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -123,6 +129,11 @@ private fun CityList(
                 item = item,
                 onClick = {
                     onCityClick(
+                        item.cityId
+                    )
+                },
+                onFavoriteClick = {
+                    onFavoriteClick(
                         item.cityId
                     )
                 }
@@ -160,7 +171,8 @@ private fun CityListScreenPreview() {
                         )
                     }
                 ),
-            onCityClick = {}
+            onCityClick = {},
+            onFavoriteClick = {}
         )
     }
 }

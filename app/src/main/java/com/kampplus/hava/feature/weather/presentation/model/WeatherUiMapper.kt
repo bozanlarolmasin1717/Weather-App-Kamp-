@@ -19,7 +19,8 @@ class WeatherUiMapper @Inject constructor(
 ) {
 
     fun toListItem(
-        cityWeather: CityWeather
+        cityWeather: CityWeather,
+        isFavorite: Boolean = false
     ): CityWeatherUiModel =
         with(cityWeather) {
 
@@ -41,13 +42,16 @@ class WeatherUiMapper @Inject constructor(
                 conditionEmoji =
                     conditionUi.emoji,
                 conditionLabel =
-                    conditionUi.label
+                    conditionUi.label,
+                isFavorite =
+                    isFavorite
             )
         }
 
     fun toForecast(
         city: City,
-        forecast: Forecast
+        forecast: Forecast,
+        isFavorite: Boolean = false
     ): ForecastUiModel =
         with(forecast) {
 
@@ -99,9 +103,7 @@ class WeatherUiMapper @Inject constructor(
                                 currentHour
                             )
                         }
-                        .take(
-                            HOURLY_COUNT
-                        )
+                        .take(HOURLY_COUNT)
                         .map { hour ->
 
                             HourlyUiModel(
@@ -162,7 +164,9 @@ class WeatherUiMapper @Inject constructor(
                                     day.precipitationProbability
                                 )
                         )
-                    }
+                    },
+                isFavorite =
+                    isFavorite
             )
         }
 
@@ -203,7 +207,8 @@ class WeatherUiMapper @Inject constructor(
 
     private companion object {
 
-        const val HOURLY_COUNT = 24
+        const val HOURLY_COUNT =
+            24
 
         val HOUR_FORMAT:
             DateTimeFormatter =

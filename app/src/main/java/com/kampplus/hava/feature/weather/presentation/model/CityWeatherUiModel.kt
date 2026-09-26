@@ -9,5 +9,6 @@ data class CityWeatherUiModel(
     val temperatureText: String,
     val temperatureC: Double,
     val conditionEmoji: String,
-    val conditionLabel: UiText
+    val conditionLabel: UiText,
+    val isFavorite: Boolean = false
 )

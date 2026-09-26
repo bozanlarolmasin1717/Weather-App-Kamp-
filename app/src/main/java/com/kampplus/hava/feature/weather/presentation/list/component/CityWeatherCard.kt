@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kampplus.hava.core.ui.component.FavoriteToggleButton
 import com.kampplus.hava.core.ui.component.TemperatureBadge
 import com.kampplus.hava.core.ui.text.UiText
 import com.kampplus.hava.core.ui.theme.HavaTheme
@@ -24,6 +25,7 @@ import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
 fun CityWeatherCard(
     item: CityWeatherUiModel,
     onClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -97,6 +99,13 @@ fun CityWeatherCard(
                             .bodyMedium
                 )
             }
+
+            FavoriteToggleButton(
+                isFavorite =
+                    item.isFavorite,
+                onClick =
+                    onFavoriteClick
+            )
         }
     }
 }
@@ -123,7 +132,8 @@ private fun CityWeatherCardPreview() {
                             "Açık"
                         )
                 ),
-            onClick = {}
+            onClick = {},
+            onFavoriteClick = {}
         )
     }
 }

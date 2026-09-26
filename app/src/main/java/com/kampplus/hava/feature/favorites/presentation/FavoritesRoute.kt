@@ -1,18 +1,19 @@
-package com.kampplus.hava.feature.weather.presentation.list
+package com.kampplus.hava.feature.favorites.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kampplus.hava.feature.weather.domain.model.City
+import com.kampplus.hava.feature.favorites.domain.model.FavoriteCity
 
 @Composable
-fun CityListRoute(
-    onCityClick: (City) -> Unit,
+fun FavoritesRoute(
+    onCityClick:
+        (FavoriteCity) -> Unit,
     modifier: Modifier = Modifier,
     viewModel:
-    CityListViewModel =
+    FavoritesViewModel =
         hiltViewModel()
 ) {
     val uiState by
@@ -20,16 +21,16 @@ fun CityListRoute(
         .uiState
         .collectAsStateWithLifecycle()
 
-    CityListScreen(
+    FavoritesScreen(
         uiState = uiState,
-        onCityClick = { cityId ->
+        onCityClick = { id ->
 
             viewModel
-                .findCity(cityId)
+                .findFavorite(id)
                 ?.let(onCityClick)
         },
-        onFavoriteClick =
-            viewModel::onToggleFavorite,
+        onRemoveFavorite =
+            viewModel::onRemoveFavorite,
         modifier = modifier
     )
 }
