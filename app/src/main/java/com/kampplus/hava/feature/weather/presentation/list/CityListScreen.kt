@@ -151,11 +151,15 @@ fun CityListScreen(
                             )
                         }
 
-                        IconButton(onClick = onFavoritesClick) {
+                        IconButton(
+                            onClick = onFavoritesClick,
+                            modifier = Modifier.size(44.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
                                 contentDescription = "Favori Şehirler",
-                                tint = Color(0xFFEF4444)
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     },
@@ -293,7 +297,8 @@ private fun CityPagerContent(
                 state = pagerState,
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = 24.dp),
-                pageSpacing = 16.dp
+                pageSpacing = 16.dp,
+                verticalAlignment = Alignment.CenterVertically
             ) { page ->
                 val cityItem = items.getOrNull(page)
                 if (cityItem != null) {

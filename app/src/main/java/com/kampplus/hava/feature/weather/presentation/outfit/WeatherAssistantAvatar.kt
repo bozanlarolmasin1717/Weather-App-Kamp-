@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,7 +66,7 @@ fun WeatherAssistantAvatar(condition: WeatherCondition, temperatureC: Double, mo
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.06f,
+        targetValue = 1.07f,
         animationSpec = infiniteRepeatable(
             animation = tween(1200),
             repeatMode = RepeatMode.Reverse
@@ -96,13 +97,14 @@ fun WeatherAssistantAvatar(condition: WeatherCondition, temperatureC: Double, mo
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(32.dp))
+                    .clip(RoundedCornerShape(36.dp))
                     .clickable { showBubble = !showBubble }
-                    .background(Color.Black.copy(alpha = 0.45f))
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                    .background(Color.Black.copy(alpha = 0.50f))
+                    .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(36.dp))
+                    .padding(start = 12.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
             ) {
                 Text(
-                    text = "Giyim Önerisi",
+                    text = "Stil Danışmanı 👔",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -112,14 +114,15 @@ fun WeatherAssistantAvatar(condition: WeatherCondition, temperatureC: Double, mo
                 Box(
                     modifier = Modifier
                         .scale(if (showBubble) 1f else pulseScale)
-                        .size(54.dp)
-                        .shadow(8.dp, CircleShape)
+                        .size(66.dp)
+                        .shadow(12.dp, CircleShape)
                         .clip(CircleShape)
                         .background(
-                            Brush.radialGradient(
+                            Brush.linearGradient(
                                 colors = listOf(Color(0xFF60A5FA), Color(0xFF1D4ED8))
                             )
-                        ),
+                        )
+                        .border(2.dp, Color.White.copy(alpha = 0.7f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     HumanFigure2D(condition = condition)
@@ -260,60 +263,142 @@ private fun SpeechBubbleCard(advice: OutfitAdvice, onDismiss: () -> Unit) {
 
 @Composable
 private fun HumanFigure2D(condition: WeatherCondition) {
-    val shirtColor = when (condition) {
-        WeatherCondition.Clear, WeatherCondition.MainlyClear -> Color(0xFFF59E0B)
-        WeatherCondition.Rain, WeatherCondition.RainShowers, WeatherCondition.Drizzle -> Color(0xFF0284C7)
-        WeatherCondition.Snow, WeatherCondition.SnowShowers -> Color(0xFFE2E8F0)
-        WeatherCondition.Thunderstorm -> Color(0xFF7C3AED)
-        else -> Color(0xFF10B981)
+    val suitColor = when (condition) {
+        WeatherCondition.Clear, WeatherCondition.MainlyClear -> Color(0xFF1E3A8A)
+        WeatherCondition.Rain, WeatherCondition.RainShowers, WeatherCondition.Drizzle -> Color(0xFF0F766E)
+        WeatherCondition.Snow, WeatherCondition.SnowShowers -> Color(0xFF475569)
+        WeatherCondition.Thunderstorm -> Color(0xFF4C1D95)
+        else -> Color(0xFF334155)
     }
 
-    Canvas(modifier = Modifier.size(42.dp)) {
-        val centerX = size.width / 2
-        val centerY = size.height / 2
+    Canvas(modifier = Modifier.size(54.dp)) {
+        val w = size.width
+        val h = size.height
+        val cx = w / 2f
+        val cy = h / 2f
 
-        drawCircle(
-            color = Color(0xFFFCD34D),
-            radius = size.width * 0.22f,
-            center = Offset(centerX, centerY - size.height * 0.12f)
-        )
-
-        drawArc(
-            color = Color(0xFF451A03),
-            startAngle = 180f,
-            sweepAngle = 180f,
-            useCenter = true,
-            topLeft = Offset(centerX - size.width * 0.22f, centerY - size.height * 0.35f),
-            size = Size(size.width * 0.44f, size.height * 0.28f)
-        )
-
-        drawCircle(
-            color = Color(0xFF1F2937),
-            radius = 2.2f,
-            center = Offset(centerX - 4.5f, centerY - size.height * 0.12f)
-        )
-        drawCircle(
-            color = Color(0xFF1F2937),
-            radius = 2.2f,
-            center = Offset(centerX + 4.5f, centerY - size.height * 0.12f)
-        )
-
-        drawArc(
-            color = Color(0xFFB45309),
-            startAngle = 10f,
-            sweepAngle = 160f,
-            useCenter = false,
-            topLeft = Offset(centerX - 4f, centerY - size.height * 0.08f),
-            size = Size(8f, 6f)
-        )
-
-        val torsoPath = Path().apply {
-            moveTo(centerX - size.width * 0.28f, size.height)
-            lineTo(centerX - size.width * 0.16f, centerY + size.height * 0.08f)
-            lineTo(centerX + size.width * 0.16f, centerY + size.height * 0.08f)
-            lineTo(centerX + size.width * 0.28f, size.height)
+        val suitPath = Path().apply {
+            moveTo(cx - w * 0.42f, h)
+            lineTo(cx - w * 0.28f, cy + h * 0.16f)
+            lineTo(cx + w * 0.28f, cy + h * 0.16f)
+            lineTo(cx + w * 0.42f, h)
             close()
         }
-        drawPath(torsoPath, color = shirtColor)
+        drawPath(suitPath, color = suitColor)
+
+        val shirtPath = Path().apply {
+            moveTo(cx - w * 0.16f, cy + h * 0.16f)
+            lineTo(cx, cy + h * 0.38f)
+            lineTo(cx + w * 0.16f, cy + h * 0.16f)
+            close()
+        }
+        drawPath(shirtPath, color = Color.White)
+
+        val bowtiePath = Path().apply {
+            moveTo(cx, cy + h * 0.22f)
+            lineTo(cx - w * 0.12f, cy + h * 0.18f)
+            lineTo(cx - w * 0.12f, cy + h * 0.26f)
+            close()
+            moveTo(cx, cy + h * 0.22f)
+            lineTo(cx + w * 0.12f, cy + h * 0.18f)
+            lineTo(cx + w * 0.12f, cy + h * 0.26f)
+            close()
+        }
+        drawPath(bowtiePath, color = Color(0xFFE11D48))
+        drawCircle(
+            color = Color(0xFFBE123C),
+            radius = w * 0.035f,
+            center = Offset(cx, cy + h * 0.22f)
+        )
+
+        drawRect(
+            color = Color(0xFFFFDFBA),
+            topLeft = Offset(cx - w * 0.08f, cy + h * 0.06f),
+            size = Size(w * 0.16f, h * 0.12f)
+        )
+
+        val headCenter = Offset(cx, cy - h * 0.08f)
+        val headRadius = w * 0.24f
+        drawCircle(
+            color = Color(0xFFFFDFBA),
+            radius = headRadius,
+            center = headCenter
+        )
+
+        drawCircle(
+            color = Color(0xFFFCA5A5).copy(alpha = 0.65f),
+            radius = w * 0.055f,
+            center = Offset(cx - w * 0.13f, cy - h * 0.05f)
+        )
+        drawCircle(
+            color = Color(0xFFFCA5A5).copy(alpha = 0.65f),
+            radius = w * 0.055f,
+            center = Offset(cx + w * 0.13f, cy - h * 0.05f)
+        )
+
+        val hairPath = Path().apply {
+            moveTo(cx - headRadius * 1.05f, headCenter.y - headRadius * 0.1f)
+            cubicTo(
+                cx - headRadius * 0.8f,
+                headCenter.y - headRadius * 1.25f,
+                cx + headRadius * 0.5f,
+                headCenter.y - headRadius * 1.30f,
+                cx + headRadius * 1.05f,
+                headCenter.y - headRadius * 0.15f
+            )
+            cubicTo(
+                cx + headRadius * 0.7f,
+                headCenter.y - headRadius * 0.75f,
+                cx - headRadius * 0.3f,
+                headCenter.y - headRadius * 0.85f,
+                cx - headRadius * 1.05f,
+                headCenter.y - headRadius * 0.1f
+            )
+            close()
+        }
+        drawPath(hairPath, color = Color(0xFF3E2723))
+
+        val browY = headCenter.y - headRadius * 0.38f
+        drawLine(
+            color = Color(0xFF3E2723),
+            start = Offset(cx - w * 0.12f, browY + 1f),
+            end = Offset(cx - w * 0.04f, browY - 1.5f),
+            strokeWidth = 2.5f
+        )
+        drawLine(
+            color = Color(0xFF3E2723),
+            start = Offset(cx + w * 0.04f, browY - 1.5f),
+            end = Offset(cx + w * 0.12f, browY + 1f),
+            strokeWidth = 2.5f
+        )
+
+        val eyeY = headCenter.y - headRadius * 0.15f
+        val leftEyeX = cx - w * 0.08f
+        val rightEyeX = cx + w * 0.08f
+        val eyeRadius = w * 0.038f
+
+        drawCircle(color = Color(0xFF1E293B), radius = eyeRadius, center = Offset(leftEyeX, eyeY))
+        drawCircle(color = Color(0xFF1E293B), radius = eyeRadius, center = Offset(rightEyeX, eyeY))
+        drawCircle(color = Color.White, radius = eyeRadius * 0.4f, center = Offset(leftEyeX - 1f, eyeY - 1f))
+        drawCircle(color = Color.White, radius = eyeRadius * 0.4f, center = Offset(rightEyeX - 1f, eyeY - 1f))
+
+        val mouthY = headCenter.y + headRadius * 0.28f
+        val smilePath = Path().apply {
+            moveTo(cx - w * 0.09f, mouthY)
+            quadraticTo(
+                cx,
+                mouthY + h * 0.10f,
+                cx + w * 0.09f,
+                mouthY
+            )
+            close()
+        }
+        drawPath(smilePath, color = Color(0xFFBE123C))
+        drawLine(
+            color = Color.White,
+            start = Offset(cx - w * 0.07f, mouthY + 1f),
+            end = Offset(cx + w * 0.07f, mouthY + 1f),
+            strokeWidth = 2f
+        )
     }
 }
