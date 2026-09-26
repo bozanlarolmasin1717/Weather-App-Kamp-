@@ -25,10 +25,17 @@ import com.kampplus.hava.core.ui.theme.HavaTheme
 import com.kampplus.hava.feature.weather.presentation.list.component.CityWeatherCard
 import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun CityListScreen(
-    uiState: UiState<List<CityWeatherUiModel>>,
+    uiState:
+    UiState<
+        List<CityWeatherUiModel>
+        >,
+    onCityClick:
+        (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -37,7 +44,9 @@ fun CityListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        stringResource(R.string.list_title)
+                        stringResource(
+                            R.string.list_title
+                        )
                     )
                 }
             )
@@ -45,26 +54,40 @@ fun CityListScreen(
     ) { innerPadding ->
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(
+                        innerPadding
+                    ),
+            contentAlignment =
+                Alignment.Center
         ) {
             when (uiState) {
+
                 UiState.Loading ->
                     CircularProgressIndicator()
 
                 UiState.Empty ->
                     Text(
-                        stringResource(R.string.empty_generic)
+                        stringResource(
+                            R.string.empty_generic
+                        )
                     )
 
                 is UiState.Error ->
-                    Text(uiState.message.asString())
+                    Text(
+                        uiState
+                            .message
+                            .asString()
+                    )
 
                 is UiState.Success ->
                     CityList(
-                        items = uiState.data
+                        items =
+                            uiState.data,
+                        onCityClick =
+                            onCityClick
                     )
             }
         }
@@ -73,19 +96,37 @@ fun CityListScreen(
 
 @Composable
 private fun CityList(
-    items: List<CityWeatherUiModel>,
+    items:
+    List<CityWeatherUiModel>,
+    onCityClick:
+        (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier =
+            modifier.fillMaxSize(),
+        contentPadding =
+            PaddingValues(16.dp),
+        verticalArrangement =
+            Arrangement.spacedBy(
+                12.dp
+            )
     ) {
         items(
             items = items,
-            key = { it.cityId }
+            key = {
+                it.cityId
+            }
         ) { item ->
-            CityWeatherCard(item = item)
+
+            CityWeatherCard(
+                item = item,
+                onClick = {
+                    onCityClick(
+                        item.cityId
+                    )
+                }
+            )
         }
     }
 }
@@ -95,20 +136,31 @@ private fun CityList(
 private fun CityListScreenPreview() {
     HavaTheme {
         CityListScreen(
-            uiState = UiState.Success(
-                List(5) { index ->
-                    CityWeatherUiModel(
-                        cityId = index.toLong(),
-                        title = "İstanbul",
-                        subtitle = "İstanbul, Türkiye",
-                        temperatureText = "2$index°",
-                        temperatureC = 20.0 + index,
-                        conditionEmoji = "⛅",
-                        conditionLabel =
-                            UiText.Dynamic("Parçalı bulutlu")
-                    )
-                }
-            )
+            uiState =
+                UiState.Success(
+                    List(5) { index ->
+
+                        CityWeatherUiModel(
+                            cityId =
+                                index.toLong(),
+                            title =
+                                "İstanbul",
+                            subtitle =
+                                "İstanbul, Türkiye",
+                            temperatureText =
+                                "2$index°",
+                            temperatureC =
+                                20.0 + index,
+                            conditionEmoji =
+                                "⛅",
+                            conditionLabel =
+                                UiText.Dynamic(
+                                    "Parçalı bulutlu"
+                                )
+                        )
+                    }
+                ),
+            onCityClick = {}
         )
     }
 }

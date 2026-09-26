@@ -23,43 +23,78 @@ import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
 @Composable
 fun CityWeatherCard(
     item: CityWeatherUiModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth()
+        onClick = onClick,
+        modifier =
+            modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier.padding(
+                    12.dp
+                ),
+            verticalAlignment =
+                Alignment.CenterVertically,
+            horizontalArrangement =
+                Arrangement.spacedBy(
+                    12.dp
+                )
         ) {
+
             TemperatureBadge(
-                text = item.temperatureText,
-                containerColor = temperatureColor(item.temperatureC)
+                text =
+                    item.temperatureText,
+                containerColor =
+                    temperatureColor(
+                        item.temperatureC
+                    )
             )
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier =
+                    Modifier.weight(1f)
             ) {
                 Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.titleMedium,
+                    text =
+                        item.title,
+                    style =
+                        MaterialTheme
+                            .typography
+                            .titleMedium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = item.subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow =
+                        TextOverflow.Ellipsis
                 )
 
                 Text(
                     text =
-                        "${item.conditionEmoji} ${item.conditionLabel.asString()}",
-                    style = MaterialTheme.typography.bodyMedium
+                        item.subtitle,
+                    style =
+                        MaterialTheme
+                            .typography
+                            .bodyMedium,
+                    color =
+                        MaterialTheme
+                            .colorScheme
+                            .onSurfaceVariant,
+                    maxLines = 1,
+                    overflow =
+                        TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text =
+                        "${item.conditionEmoji} " +
+                            item
+                                .conditionLabel
+                                .asString(),
+                    style =
+                        MaterialTheme
+                            .typography
+                            .bodyMedium
                 )
             }
         }
@@ -71,15 +106,24 @@ fun CityWeatherCard(
 private fun CityWeatherCardPreview() {
     HavaTheme {
         CityWeatherCard(
-            item = CityWeatherUiModel(
-                cityId = 1,
-                title = "Ankara",
-                subtitle = "Ankara, Türkiye",
-                temperatureText = "21°",
-                temperatureC = 21.0,
-                conditionEmoji = "☀️",
-                conditionLabel = UiText.Dynamic("Açık")
-            )
+            item =
+                CityWeatherUiModel(
+                    cityId = 1,
+                    title = "Ankara",
+                    subtitle =
+                        "Ankara, Türkiye",
+                    temperatureText =
+                        "21°",
+                    temperatureC =
+                        21.0,
+                    conditionEmoji =
+                        "☀️",
+                    conditionLabel =
+                        UiText.Dynamic(
+                            "Açık"
+                        )
+                ),
+            onClick = {}
         )
     }
 }
