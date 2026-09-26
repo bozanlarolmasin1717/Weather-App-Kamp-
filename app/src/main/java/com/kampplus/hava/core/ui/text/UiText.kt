@@ -24,4 +24,10 @@ sealed interface UiText {
         is Dynamic -> value
         is Resource -> stringResource(resId, *args)
     }
+
+    /** Compose dışında (ör. paylaşım Intent'i) metni çözmek için. */
+    fun asString(resources: android.content.res.Resources): String = when (this) {
+        is Dynamic -> value
+        is Resource -> resources.getString(resId, *args)
+    }
 }

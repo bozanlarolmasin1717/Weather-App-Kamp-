@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">Hava</string>
+    <string name="list_title">Şehirler</string>
+    <string name="error_generic">Bir şeyler ters gitti.</string>
+    <string name="empty_generic">Gösterilecek kayıt yok.</string>
+    <string name="condition_clear">Açık</string>
+    <string name="condition_mainly_clear">Az bulutlu</string>
+    <string name="condition_partly_cloudy">Parçalı bulutlu</string>
+    <string name="condition_overcast">Kapalı</string>
+    <string name="condition_fog">Sisli</string>
+    <string name="condition_drizzle">Çisenti</string>
+    <string name="condition_rain">Yağmurlu</string>
+    <string name="condition_snow">Karlı</string>
+    <string name="condition_rain_showers">Sağanak yağış</string>
+    <string name="condition_snow_showers">Kar sağanağı</string>
+    <string name="condition_thunderstorm">Gök gürültülü fırtına</string>
+    <string name="condition_unknown">Bilinmiyor</string>
+    <string name="detail_title">Hava Tahmini</string>
+    <string name="action_back">Geri</string>
+    <string name="today">Bugün</string>
+    <string name="detail_hourly">Saatlik</string>
+    <string name="detail_daily">7 Günlük</string>
+    <string name="detail_feels_like">Hissedilen</string>
+    <string name="detail_humidity">Nem</string>
+    <string name="detail_wind">Rüzgâr</string>
+    <string name="action_share">Paylaş</string>
+    <string name="share_text">%1$s şu an %2$s %3$s %4$s</string>
 </resources>
