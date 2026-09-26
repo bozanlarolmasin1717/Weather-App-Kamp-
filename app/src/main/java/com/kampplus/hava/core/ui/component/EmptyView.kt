@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.core.ui.theme.HavaTheme
 
+/** "Veri yok" durumu. Ekran kendi ikon ve metnini verir, görünüm tek yerde tanımlıdır. */
 @Composable
 fun EmptyView(
     icon: ImageVector,
@@ -54,10 +55,6 @@ fun EmptyView(
 @Composable
 private fun EmptyViewPreview() {
     HavaTheme {
-        EmptyView(
-            icon = Icons.Filled.FavoriteBorder,
-            title = "Henüz favorin yok",
-            message = "Kalp ikonuna dokunarak ekleyebilirsin."
-        )
+        EmptyView(icon = Icons.Filled.FavoriteBorder, title = "Henüz favorin yok", message = "Kalp ikonuna dokunarak ekleyebilirsin.")
     }
 }

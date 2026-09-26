@@ -20,10 +20,7 @@ import com.kampplus.hava.feature.favorites.presentation.FavoriteCityUiModel
 @Composable
 fun FavoriteCityCard(item: FavoriteCityUiModel, onClick: () -> Unit, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Filled.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             Column(
                 modifier = Modifier
@@ -31,11 +28,7 @@ fun FavoriteCityCard(item: FavoriteCityUiModel, onClick: () -> Unit, onRemoveCli
                     .padding(horizontal = 12.dp)
             ) {
                 Text(text = item.title, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = item.subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(text = item.subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             FavoriteToggleButton(isFavorite = true, onClick = onRemoveClick)
         }

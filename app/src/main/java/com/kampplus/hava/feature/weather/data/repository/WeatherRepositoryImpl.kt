@@ -24,8 +24,10 @@ class WeatherRepositoryImpl @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WeatherRepository {
 
-    override fun getCityWeathers(): Flow<AppResult<List<CityWeather>>> = flow {
-        emit(errorMapper.runCatchingApp { remoteDataSource.getCurrentWeather(cityCatalog.cities()) })
+    override fun getCityWeathers(): Flow<AppResult<List<CityWeather>>> = getCurrentWeather(cityCatalog.cities())
+
+    override fun getCurrentWeather(cities: List<City>): Flow<AppResult<List<CityWeather>>> = flow {
+        emit(errorMapper.runCatchingApp { remoteDataSource.getCurrentWeather(cities) })
     }.flowOn(ioDispatcher)
 
     override suspend fun getForecast(city: City): AppResult<Forecast> = withContext(ioDispatcher) {

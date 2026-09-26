@@ -66,8 +66,7 @@ private fun CityWeatherCardPreview() {
                 temperatureText = "21°",
                 temperatureC = 21.0,
                 conditionEmoji = "☀️",
-                conditionLabel = UiText.Dynamic("Açık"),
-                isFavorite = false
+                conditionLabel = UiText.Dynamic("Açık")
             ),
             onClick = {},
             onFavoriteClick = {}

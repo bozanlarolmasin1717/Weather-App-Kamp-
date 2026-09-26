@@ -21,11 +21,7 @@ fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = day.dayLabel.asString(),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
+        Text(text = day.dayLabel.asString(), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         Text(
             text = day.precipitationText.orEmpty(),
             style = MaterialTheme.typography.labelMedium,
@@ -33,11 +29,7 @@ fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
             modifier = Modifier.width(44.dp),
             textAlign = TextAlign.End
         )
-        Text(
-            text = day.emoji,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+        Text(text = day.emoji, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 12.dp))
         Text(
             text = day.minText,
             style = MaterialTheme.typography.bodyLarge,
@@ -45,11 +37,6 @@ fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
             modifier = Modifier.width(40.dp),
             textAlign = TextAlign.End
         )
-        Text(
-            text = day.maxText,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.width(44.dp),
-            textAlign = TextAlign.End
-        )
+        Text(text = day.maxText, style = MaterialTheme.typography.titleMedium, modifier = Modifier.width(44.dp), textAlign = TextAlign.End)
     }
 }

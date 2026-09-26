@@ -3,7 +3,7 @@ package com.kampplus.hava.feature.weather.domain.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/** Bir şehrin anlık durumu + önümüzdeki saatler ve günler. */
+/** Bir şehrin anlık durumu + önümüzdeki saatler ve günler. Zamanlar şehrin yerel saatindedir. */
 data class Forecast(
     val current: CurrentWeather,
     val hourly: List<HourlyForecast>,

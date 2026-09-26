@@ -6,6 +6,7 @@ import com.kampplus.hava.core.ui.text.UiText
 import com.kampplus.hava.feature.weather.domain.policy.WeatherCondition
 import javax.inject.Inject
 
+/** Bir hava koşulunun ekrandaki temsili. */
 data class WeatherConditionUi(
     val emoji: String,
     @param:StringRes val labelRes: Int
@@ -17,6 +18,10 @@ data class WeatherConditionUi(
     }
 }
 
+/**
+ * Hava koşullarının UI karşılıkları Hilt `@IntoMap` ile toplanır. Yeni bir görünüm eklemek için
+ * yalnızca `WeatherConditionUiModule`'e girdi eklenir; eşlemesi olmayan koşul [WeatherConditionUi.Unknown] ile gösterilir.
+ */
 class WeatherConditionUiRegistry @Inject constructor(
     private val entries: Map<WeatherCondition, @JvmSuppressWildcards WeatherConditionUi>
 ) {

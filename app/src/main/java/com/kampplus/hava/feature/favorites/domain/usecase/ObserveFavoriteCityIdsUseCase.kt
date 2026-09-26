@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
+/** Liste ve detay ekranlarının "favori mi?" sorusunu tek kaynaktan cevaplaması için. */
 class ObserveFavoriteCityIdsUseCase @Inject constructor(
     private val repository: FavoriteCityRepository
 ) {

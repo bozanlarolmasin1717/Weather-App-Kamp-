@@ -16,9 +16,7 @@ fun FavoriteToggleButton(isFavorite: Boolean, onClick: () -> Unit, modifier: Mod
     IconButton(onClick = onClick, modifier = modifier) {
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-            contentDescription = stringResource(
-                if (isFavorite) R.string.action_remove_favorite else R.string.action_add_favorite
-            ),
+            contentDescription = stringResource(if (isFavorite) R.string.action_remove_favorite else R.string.action_add_favorite),
             tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

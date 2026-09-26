@@ -28,6 +28,8 @@ class FavoritesViewModel @Inject constructor(
     private var lastRemoved: FavoriteCity? = null
 
     private val _events = Channel<FavoritesEvent>(Channel.BUFFERED)
+
+    /** Tek seferlik UI olayları (snackbar). State'e konmaz; ekran dönünce tekrar gösterilmemeli. */
     val events: Flow<FavoritesEvent> = _events.receiveAsFlow()
 
     val uiState: StateFlow<UiState<List<FavoriteCityUiModel>>> = observeFavoriteCities()

@@ -2,66 +2,128 @@ package com.kampplus.hava.feature.weather.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kampplus.hava.R
 import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.ui.state.UiState
-import com.kampplus.hava.core.ui.text.UiText
+import com.kampplus.hava.core.ui.text.toUiText
 import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.model.City
+import com.kampplus.hava.feature.weather.domain.model.CityWeather
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
-import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
+import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.model.WeatherUiMapper
 import com.kampplus.hava.feature.weather.presentation.model.toFavorite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class CityListViewModel @Inject constructor(
-    getCityWeathers: GetCityWeathersUseCase,
+    private val getCityWeathers: GetCityWeathersUseCase,
+    private val searchCityWeathers: SearchCityWeathersUseCase,
     observeFavoriteCityIds: ObserveFavoriteCityIdsUseCase,
     private val toggleFavoriteCity: ToggleFavoriteCityUseCase,
     private val uiMapper: WeatherUiMapper
 ) : ViewModel() {
 
+    /** Detaya giderken ve favori eklerken şehrin tamamına ihtiyaç var; son yüklenen liste burada tutulur. */
     private var loadedCities: Map<Long, City> = emptyMap()
 
-    val uiState: StateFlow<UiState<List<CityWeatherUiModel>>> = combine(
-        getCityWeathers().onEach { result ->
-            if (result is AppResult.Success) loadedCities = result.data.associate { it.city.id to it.city }
-        },
-        observeFavoriteCityIds()
-    ) { result, favoriteIds ->
-        when (result) {
-            is AppResult.Success ->
-                if (result.data.isEmpty()) {
-                    UiState.Empty
-                } else {
-                    UiState.Success(result.data.map { uiMapper.toListItem(it, isFavorite = it.city.id in favoriteIds) })
-                }
+    private val query = MutableStateFlow("")
 
-            is AppResult.Failure -> UiState.Error(UiText.Resource(R.string.error_generic))
+    /** Her artışta liste yeniden yüklenir (tekrar dene / yenile). */
+    private val reloadTrigger = MutableStateFlow(0)
+
+    /** Yenilemede mevcut liste ekranda kalır, Loading'e düşülmez. */
+    private val isRefreshing = MutableStateFlow(false)
+
+    /**
+     * Yazarken her tuşa istek atılmaz: arama [SEARCH_DEBOUNCE_MS] kadar bekletilir.
+     * Kısa sorguda öne çıkan şehirler gösterilir. flatMapLatest, yeni sorgu gelince eski isteği iptal eder.
+     */
+    private val results: Flow<AppResult<List<CityWeather>>?> = combine(
+        query
+            .map { it.trim().takeIf { text -> text.length >= MIN_QUERY_LENGTH }.orEmpty() }
+            .debounce { if (it.isEmpty()) 0L else SEARCH_DEBOUNCE_MS }
+            .distinctUntilChanged(),
+        reloadTrigger
+    ) { searchText, _ -> searchText }
+        .flatMapLatest { searchText ->
+            val source = if (searchText.isEmpty()) getCityWeathers() else searchCityWeathers(searchText)
+            source
+                .onEach { result ->
+                    if (result is AppResult.Success) loadedCities = result.data.associate { it.city.id to it.city }
+                    isRefreshing.value = false
+                }
+                .map<AppResult<List<CityWeather>>, AppResult<List<CityWeather>>?> { it }
+                .onStart { if (!isRefreshing.value) emit(null) }
         }
+
+    val uiState: StateFlow<CityListUiState> = combine(
+        query,
+        results,
+        observeFavoriteCityIds(),
+        isRefreshing
+    ) { query, result, favoriteIds, refreshing ->
+        CityListUiState(
+            query = query,
+            content = when (result) {
+                null -> UiState.Loading
+                is AppResult.Success ->
+                    if (result.data.isEmpty()) {
+                        UiState.Empty
+                    } else {
+                        UiState.Success(result.data.map { uiMapper.toListItem(it, isFavorite = it.city.id in favoriteIds) })
+                    }
+                is AppResult.Failure -> UiState.Error(result.error.toUiText())
+            },
+            isRefreshing = refreshing
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
-        initialValue = UiState.Loading
+        initialValue = CityListUiState()
     )
 
     fun findCity(cityId: Long): City? = loadedCities[cityId]
+
+    fun onQueryChange(text: String) {
+        query.value = text
+    }
+
+    fun onRetry() {
+        reloadTrigger.update { it + 1 }
+    }
+
+    fun onRefresh() {
+        isRefreshing.value = true
+        reloadTrigger.update { it + 1 }
+    }
 
     fun onToggleFavorite(cityId: Long) {
         val city = loadedCities[cityId] ?: return
         viewModelScope.launch { toggleFavoriteCity(city.toFavorite()) }
     }
 
-    private companion object {
-        const val STOP_TIMEOUT_MS = 5_000L
+    companion object {
+        const val MIN_QUERY_LENGTH = 2
+        const val SEARCH_DEBOUNCE_MS = 400L
+        private const val STOP_TIMEOUT_MS = 5_000L
     }
 }

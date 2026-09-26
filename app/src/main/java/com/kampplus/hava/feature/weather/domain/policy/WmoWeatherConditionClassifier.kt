@@ -3,9 +3,7 @@ package com.kampplus.hava.feature.weather.domain.policy
 import com.kampplus.hava.feature.weather.domain.model.WeatherCode
 import javax.inject.Inject
 
-/**
- * WMO 4677 standardına uygun hava durumu sınıflandırıcı.
- */
+/** WMO 4677 kod tablosu. Farklı bir sağlayıcının kodları için yeni implementasyon bağlanır. */
 class WmoWeatherConditionClassifier @Inject constructor() : WeatherConditionClassifier {
     override fun classify(code: WeatherCode): WeatherCondition = when (code.value) {
         0 -> WeatherCondition.Clear

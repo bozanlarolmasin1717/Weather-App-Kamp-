@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
+/** viewModelScope'un kullandığı Main dispatcher'ı test dispatcher'ı ile değiştirir. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     val testDispatcher: TestDispatcher = StandardTestDispatcher()

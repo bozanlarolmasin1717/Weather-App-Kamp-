@@ -16,9 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.kampplus.hava.core.ui.theme.HavaTheme
 import com.kampplus.hava.core.ui.theme.TemperaturePalette
 
-/**
- * Sıcaklık rozeti: Belirtilen sıcaklık değerini renkli bir kart içinde gösterir.
- */
+/** Sıcaklığı renkli bir kare içinde gösterir. Renk kararı çağırana aittir. */
 @Composable
 fun TemperatureBadge(
     text: String,

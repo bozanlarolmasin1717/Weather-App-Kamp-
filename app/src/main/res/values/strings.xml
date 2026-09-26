@@ -2,7 +2,6 @@
     <string name="app_name">Hava</string>
     <string name="list_title">Şehirler</string>
     <string name="error_generic">Bir şeyler ters gitti.</string>
-    <string name="empty_generic">Gösterilecek kayıt yok.</string>
     <string name="condition_clear">Açık</string>
     <string name="condition_mainly_clear">Az bulutlu</string>
     <string name="condition_partly_cloudy">Parçalı bulutlu</string>
@@ -34,4 +33,14 @@
     <string name="favorites_empty_message">Listede ya da tahmin ekranında kalp ikonuna dokunarak şehirleri buraya ekleyebilirsin.</string>
     <string name="favorites_removed">%1$s favorilerden çıkarıldı</string>
     <string name="action_undo">Geri al</string>
+    <string name="action_retry">Tekrar dene</string>
+    <string name="error_network">İnternet bağlantısı yok. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="error_not_found">Bu kayıt bulunamadı.</string>
+    <string name="error_parse">Sunucudan beklenmeyen bir yanıt geldi.</string>
+    <string name="error_server">Sunucu şu anda yanıt veremiyor (HTTP %1$d).</string>
+    <string name="list_empty_title">Şehir bulunamadı</string>
+    <string name="list_empty_message">Gösterilecek şehir yok.</string>
+    <string name="search_hint">Şehir ara (ör. Berlin, Rize)</string>
+    <string name="action_clear">Temizle</string>
+    <string name="search_empty_message">“%1$s” için şehir bulunamadı.</string>
 </resources>

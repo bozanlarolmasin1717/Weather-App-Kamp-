@@ -26,9 +26,7 @@ fun HourlyForecastRow(items: List<HourlyUiModel>, modifier: Modifier = Modifier)
         items(items = items, key = { it.timeText }) { hour ->
             Card(modifier = Modifier.width(72.dp)) {
                 Column(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .align(Alignment.CenterHorizontally),
+                    modifier = Modifier.padding(vertical = 12.dp).align(Alignment.CenterHorizontally),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {

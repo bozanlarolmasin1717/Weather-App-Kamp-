@@ -4,6 +4,7 @@ import com.kampplus.hava.feature.favorites.domain.model.FavoriteCity
 import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.Coordinates
 
+/** Hava özelliği, favoriler özelliğinin domain modelini tanır; tersi geçerli değildir. */
 fun City.toFavorite() = FavoriteCity(
     id = id,
     name = name,

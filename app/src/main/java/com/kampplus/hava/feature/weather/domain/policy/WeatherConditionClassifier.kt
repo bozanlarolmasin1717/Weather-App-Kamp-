@@ -2,9 +2,7 @@ package com.kampplus.hava.feature.weather.domain.policy
 
 import com.kampplus.hava.feature.weather.domain.model.WeatherCode
 
-/**
- * WMO hava kodunu uygulamanın kullandığı hava koşulu durumuna çeviren kural sözleşmesi.
- */
+/** Ham hava kodunu uygulamanın konuştuğu hava koşuluna eşleyen iş kuralı (strategy). */
 fun interface WeatherConditionClassifier {
     fun classify(code: WeatherCode): WeatherCondition
 }

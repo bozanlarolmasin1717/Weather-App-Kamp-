@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+/**
+ * Uygulama açık kaldığı sürece favorileri bellekte tutar (CP3).
+ * `@Singleton` olduğu için tüm ekranlar aynı state'i paylaşır; uygulama kapanınca veri kaybolur.
+ */
 @Singleton
 class InMemoryFavoriteCityDataSource @Inject constructor() : FavoriteCityLocalDataSource {
 

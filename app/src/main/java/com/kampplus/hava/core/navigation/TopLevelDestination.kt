@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.kampplus.hava.R
 import kotlin.reflect.KClass
 
+/** Alt navigasyon çubuğundaki sekmeler. Yeni sekme = yeni enum değeri + NavHost'ta bir `composable`. */
 enum class TopLevelDestination(
     val route: Any,
     val routeClass: KClass<*>,

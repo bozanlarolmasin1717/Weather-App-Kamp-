@@ -11,6 +11,11 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 
+/**
+ * CP1–CP3 için koda gömülü sabit hava verisi. İnternet gerektirmez; aynı şehir için
+ * her zaman aynı değeri üretir. CP4'ten itibaren bağlı değil; internetsiz demo için
+ * `WeatherDataModule`'de tekrar bağlanabilir.
+ */
 class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSource {
 
     override suspend fun getCurrentWeather(cities: List<City>): List<CityWeather> {
@@ -26,6 +31,7 @@ class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSourc
             val time = OBSERVED_AT.plusHours(hour.toLong())
             HourlyForecast(
                 time = time,
+                // Gün içi eğri, gözlem saatinde anlık sıcaklığa eşit olacak şekilde kaydırılır.
                 temperatureC = current.temperatureC + DAILY_CURVE[time.hour] - DAILY_CURVE[OBSERVED_AT.hour],
                 weatherCode = if (hour == 0) current.weatherCode else WeatherCode(CODES[(slot + hour) % CODES.size]),
                 precipitationProbability = (hour * 7) % 60
@@ -43,6 +49,7 @@ class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSourc
         return Forecast(current = current, hourly = hourly, daily = daily)
     }
 
+    /** Liste ve detay aynı şehir için aynı anlık değeri göstersin diye tek kaynaktan üretilir. */
     private fun currentFor(city: City): CurrentWeather {
         val slot = slotOf(city)
         val temperature = TEMPERATURES[slot % TEMPERATURES.size]
@@ -67,10 +74,8 @@ class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSourc
         )
         const val FAKE_LATENCY_MS = 300L
         val OBSERVED_AT: LocalDateTime = LocalDateTime.of(2026, 9, 24, 12, 0)
-        val TEMPERATURES = listOf(
-            18.4, 21.0, 26.3, 19.7, 29.1, 30.2, 22.8, 27.5, 31.4, 20.1,
-            28.0, 25.6, 17.9, 16.4, 19.2, 18.8, 11.3, 13.7, 23.5, 27.0
-        )
+        val TEMPERATURES =
+            listOf(18.4, 21.0, 26.3, 19.7, 29.1, 30.2, 22.8, 27.5, 31.4, 20.1, 28.0, 25.6, 17.9, 16.4, 19.2, 18.8, 11.3, 13.7, 23.5, 27.0)
         val CODES = listOf(2, 0, 1, 3, 0, 1, 0, 2, 0, 61, 1, 0, 3, 45, 80, 63, 2, 71, 1, 95)
     }
 }

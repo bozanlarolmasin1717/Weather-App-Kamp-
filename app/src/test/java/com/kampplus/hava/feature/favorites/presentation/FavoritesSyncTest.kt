@@ -11,8 +11,10 @@ import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIds
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
+import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.detail.ForecastDetailViewModel
 import com.kampplus.hava.feature.weather.presentation.list.CityListViewModel
+import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.city
@@ -31,7 +33,6 @@ import org.junit.Rule
 import org.junit.Test
 
 /** CP3 kabul kriteri: "birinde ekleyince diğerinde de görünüyor". */
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FavoritesSyncTest {
 
     @get:Rule
@@ -46,8 +47,15 @@ class FavoritesSyncTest {
     private val observeIds = ObserveFavoriteCityIdsUseCase(favoritesRepository)
     private val toggle = ToggleFavoriteCityUseCase(favoritesRepository)
 
+    // Lazy: ViewModel'ler MainDispatcherRule, Main dispatcher'ı değiştirdikten sonra oluşturulmalı.
     private val listViewModel by lazy {
-        CityListViewModel(GetCityWeathersUseCase(weatherRepository), observeIds, toggle, testUiMapper())
+        CityListViewModel(
+            getCityWeathers = GetCityWeathersUseCase(weatherRepository),
+            searchCityWeathers = SearchCityWeathersUseCase(FakeCityRepository(), weatherRepository),
+            observeFavoriteCityIds = observeIds,
+            toggleFavoriteCity = toggle,
+            uiMapper = testUiMapper()
+        )
     }
     private val detailViewModel by lazy {
         ForecastDetailViewModel(
@@ -111,6 +119,10 @@ class FavoritesSyncTest {
         assertTrue(listIsFavorite())
     }
 
+    /**
+     * stateIn(WhileSubscribed) akışlarını ekran açıkmış gibi aktif tutar.
+     * Not: advanceUntilIdle() yalnızca backgroundScope işi kaldığında durur; bu yüzden runCurrent() kullanılır.
+     */
     private fun TestScope.subscribeAll() {
         backgroundScope.launch { listViewModel.uiState.collect {} }
         backgroundScope.launch { detailViewModel.uiState.collect {} }
@@ -118,7 +130,7 @@ class FavoritesSyncTest {
         runCurrent()
     }
 
-    private fun listIsFavorite() = (listViewModel.uiState.value as UiState.Success).data.single().isFavorite
+    private fun listIsFavorite() = (listViewModel.uiState.value.content as UiState.Success).data.single().isFavorite
 
     private fun detailIsFavorite() = (detailViewModel.uiState.value as UiState.Success).data.isFavorite
 }

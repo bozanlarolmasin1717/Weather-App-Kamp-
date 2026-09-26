@@ -13,6 +13,7 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+/** Domain modellerini ekranların ihtiyaç duyduğu biçimlendirilmiş modellere çevirir. */
 class WeatherUiMapper @Inject constructor(
     private val conditionClassifier: WeatherConditionClassifier,
     private val conditionUiRegistry: WeatherConditionUiRegistry
