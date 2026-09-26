@@ -3,6 +3,9 @@ package com.kampplus.hava.feature.weather.data.remote
 import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.model.CityWeather
 import com.kampplus.hava.feature.weather.domain.model.CurrentWeather
+import com.kampplus.hava.feature.weather.domain.model.DailyForecast
+import com.kampplus.hava.feature.weather.domain.model.Forecast
+import com.kampplus.hava.feature.weather.domain.model.HourlyForecast
 import com.kampplus.hava.feature.weather.domain.model.WeatherCode
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -27,7 +30,45 @@ class FakeWeatherRemoteDataSource @Inject constructor() : WeatherRemoteDataSourc
         }
     }
 
+    override suspend fun getForecast(city: City): Forecast {
+        delay(FAKE_LATENCY_MS)
+        val base = TEMPERATURES[(city.id % TEMPERATURES.size).toInt()]
+        val current = CurrentWeather(
+            temperatureC = base,
+            weatherCode = WeatherCode(CODES[(city.id % CODES.size).toInt()]),
+            observedAt = OBSERVED_AT,
+            apparentTemperatureC = base - 1.5,
+            humidityPercent = 55,
+            windSpeedKmh = 12.0
+        )
+        val hourly = List(HOURS) { hour ->
+            HourlyForecast(
+                time = OBSERVED_AT.plusHours(hour.toLong()),
+
+                temperatureC = base + DAILY_CURVE[(OBSERVED_AT.hour + hour) % DAILY_CURVE.size],
+                weatherCode = WeatherCode(CODES[(hour + city.id.toInt()) % CODES.size]),
+                precipitationProbability = (hour * 7) % 60
+            )
+        }
+        val daily = List(DAYS) { day ->
+            DailyForecast(
+                date = OBSERVED_AT.toLocalDate().plusDays(day.toLong()),
+                minTemperatureC = base - 6 + day % 3,
+                maxTemperatureC = base + 3 - day % 2,
+                weatherCode = WeatherCode(CODES[(day * 3 + city.id.toInt()) % CODES.size]),
+                precipitationProbability = (day * 13) % 80
+            )
+        }
+        return Forecast(current = current, hourly = hourly, daily = daily)
+    }
+
     private companion object {
+        const val HOURS = 24
+        const val DAYS = 7
+        val DAILY_CURVE = listOf(
+            -5.0, -5.5, -6.0, -6.0, -5.5, -5.0, -4.0, -2.5, -1.0, 0.5, 1.5, 2.5,
+            3.0, 3.5, 3.5, 3.0, 2.0, 1.0, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5
+        )
         const val FAKE_LATENCY_MS = 300L
         val OBSERVED_AT: LocalDateTime = LocalDateTime.of(2026, 9, 24, 12, 0)
         val TEMPERATURES =

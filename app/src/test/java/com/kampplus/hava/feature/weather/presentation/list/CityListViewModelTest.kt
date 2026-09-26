@@ -4,13 +4,12 @@ import app.cash.turbine.test
 import com.kampplus.hava.core.common.error.AppError
 import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.ui.state.UiState
-import com.kampplus.hava.feature.weather.domain.policy.WmoWeatherConditionClassifier
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
-import com.kampplus.hava.feature.weather.presentation.model.WeatherConditionUiRegistry
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.city
 import com.kampplus.hava.testing.cityWeather
+import com.kampplus.hava.testing.testUiMapper
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,8 +25,7 @@ class CityListViewModelTest {
 
     private fun createViewModel() = CityListViewModel(
         getCityWeathers = GetCityWeathersUseCase(repository),
-        conditionClassifier = WmoWeatherConditionClassifier(),
-        conditionUiRegistry = WeatherConditionUiRegistry(emptyMap())
+        uiMapper = testUiMapper()
     )
 
     @Test
