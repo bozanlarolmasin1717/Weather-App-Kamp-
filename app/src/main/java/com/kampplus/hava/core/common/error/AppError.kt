@@ -1,6 +1,5 @@
 package com.kampplus.hava.core.common.error
 
-/** Uygulama genelindeki hata sözlüğü. UI metinleri presentation katmanında üretilir. */
 sealed interface AppError {
     data object Network : AppError
 

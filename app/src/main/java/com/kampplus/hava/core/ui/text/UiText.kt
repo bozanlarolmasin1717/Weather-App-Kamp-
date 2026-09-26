@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 
-/** ViewModel'in Context'e ihtiyaç duymadan metin üretebilmesi için soyutlama. */
 sealed interface UiText {
     data class Dynamic(
         val value: String

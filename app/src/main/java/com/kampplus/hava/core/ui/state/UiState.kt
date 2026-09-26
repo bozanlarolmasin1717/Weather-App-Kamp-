@@ -2,7 +2,6 @@ package com.kampplus.hava.core.ui.state
 
 import com.kampplus.hava.core.ui.text.UiText
 
-/** PDF'teki dört ekran durumu: yükleniyor / veri var / boş / hata. */
 sealed interface UiState<out T> {
     data object Loading : UiState<Nothing>
 

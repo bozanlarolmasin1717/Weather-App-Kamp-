@@ -2,7 +2,6 @@ package com.kampplus.hava.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Marka renkleri
 internal val Teal10 = Color(0xFF002022)
 internal val Teal20 = Color(0xFF00373A)
 internal val Teal30 = Color(0xFF004F53)
@@ -21,7 +20,6 @@ internal val NeutralVariant90 = Color(0xFFDAE4E5)
 internal val Red40 = Color(0xFFBA1A1A)
 internal val Red80 = Color(0xFFFFB4AB)
 
-/** Sıcaklık vurgusu renkleri (soğuk → sıcak). */
 object TemperaturePalette {
     val Freezing = Color(0xFF1565C0)
     val Cold = Color(0xFF0288D1)
