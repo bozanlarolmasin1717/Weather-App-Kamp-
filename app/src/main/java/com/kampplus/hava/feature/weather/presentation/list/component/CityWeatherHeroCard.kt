@@ -12,19 +12,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -43,14 +40,13 @@ fun CityWeatherHeroCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavorit
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 10.dp, shape = RoundedCornerShape(28.dp))
             .clip(RoundedCornerShape(28.dp))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.White.copy(alpha = 0.22f),
-                        gradientColors.cardBackground,
-                        Color.Black.copy(alpha = 0.40f)
+                        Color.White.copy(alpha = 0.18f),
+                        gradientColors.cardBackground.copy(alpha = 0.20f),
+                        Color.White.copy(alpha = 0.08f)
                     )
                 )
             )
@@ -60,7 +56,7 @@ fun CityWeatherHeroCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavorit
                 shape = RoundedCornerShape(28.dp)
             )
             .clickable(onClick = onClick)
-            .padding(22.dp)
+            .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -96,7 +92,7 @@ fun CityWeatherHeroCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavorit
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = item.conditionEmoji,
@@ -117,43 +113,33 @@ fun CityWeatherHeroCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavorit
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Surface(
-                shape = CircleShape,
-                color = Color.White.copy(alpha = 0.22f)
-            ) {
-                Text(
-                    text = item.conditionLabel.asString(),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
-                    ),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+            Text(
+                text = item.conditionLabel.asString(),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White.copy(alpha = 0.90f)
                 )
-            }
+            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White.copy(alpha = 0.18f))
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(top = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Detaylı Hava Tahmini",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Medium,
-                        color = Color.White
+                        color = Color.White.copy(alpha = 0.85f)
                     )
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(18.dp)
+                    tint = Color.White.copy(alpha = 0.85f),
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }

@@ -296,8 +296,6 @@ private fun CityPagerContent(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                pageSpacing = 16.dp,
                 verticalAlignment = Alignment.CenterVertically
             ) { page ->
                 val cityItem = items.getOrNull(page)
@@ -305,7 +303,8 @@ private fun CityPagerContent(
                     CityWeatherHeroCard(
                         item = cityItem,
                         onClick = { onCityClick(cityItem.cityId) },
-                        onFavoriteClick = { onFavoriteClick(cityItem.cityId) }
+                        onFavoriteClick = { onFavoriteClick(cityItem.cityId) },
+                        modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
             }
