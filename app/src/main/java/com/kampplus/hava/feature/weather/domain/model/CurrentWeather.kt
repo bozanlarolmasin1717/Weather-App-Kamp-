@@ -9,5 +9,5 @@ data class CurrentWeather(
     val apparentTemperatureC: Double? = null,
     val humidityPercent: Int? = null,
     val windSpeedKmh: Double? = null,
-    val isDay: Boolean = true
+    val isDay: Boolean? = null
 )

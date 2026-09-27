@@ -69,6 +69,8 @@ class WeatherUiMapper @Inject constructor(
             conditionUi.emoji,
             conditionLabel =
             conditionUi.label,
+            isDay = current.isDay,
+            timeZoneId = timeZoneId,
             feelsLikeText =
             current
                 .apparentTemperatureC
@@ -96,6 +98,7 @@ class WeatherUiMapper @Inject constructor(
                 .map { hour ->
 
                     HourlyUiModel(
+                        time = hour.time,
                         timeText =
                         hour.time.format(
                             HOUR_FORMAT
@@ -115,14 +118,12 @@ class WeatherUiMapper @Inject constructor(
                     )
                 },
             daily =
-            daily.mapIndexed {
-                    index,
-                    day
-                ->
+            daily.map { day ->
 
                 DailyUiModel(
+                    date = day.date,
                     dayLabel =
-                    if (index == 0) {
+                    if (day.date == current.observedAt.toLocalDate()) {
                         UiText.Resource(
                             R.string.today
                         )

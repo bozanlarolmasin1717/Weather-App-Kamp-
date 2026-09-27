@@ -41,6 +41,8 @@ import com.kampplus.hava.feature.weather.presentation.model.DailyUiModel
 import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 import com.kampplus.hava.feature.weather.presentation.model.HourlyUiModel
 import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -306,11 +308,14 @@ private fun ForecastDetailScreenPreview() {
                     temperatureC = 21.0,
                     conditionEmoji = "☀️",
                     conditionLabel = UiText.Dynamic("Açık"),
+                    isDay = true,
+                    timeZoneId = "Europe/Istanbul",
                     feelsLikeText = "20°",
                     humidityText = "%45",
                     windText = "12 km/sa",
                     hourly = List(8) {
                         HourlyUiModel(
+                            time = LocalDateTime.of(2026, 9, 24, 10 + it, 0),
                             timeText = "1$it:00",
                             emoji = "☀️",
                             temperatureText = "2$it°",
@@ -319,6 +324,7 @@ private fun ForecastDetailScreenPreview() {
                     },
                     daily = List(7) {
                         DailyUiModel(
+                            date = LocalDate.of(2026, 9, 24).plusDays(it.toLong()),
                             dayLabel = UiText.Dynamic("Cuma"),
                             emoji = "⛅",
                             minText = "14°",

@@ -17,6 +17,7 @@ import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.forecast
 import com.kampplus.hava.testing.testUiMapper
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -169,6 +170,11 @@ class ForecastDetailViewModelTest {
                 )
 
                 assertEquals(
+                    LocalDateTime.of(2026, 9, 24, 12, 0),
+                    model.hourly.first().time
+                )
+
+                assertEquals(
                     UiText.Resource(
                         R.string.today
                     ),
@@ -185,6 +191,41 @@ class ForecastDetailViewModelTest {
                         .first()
                         .precipitationText
                 )
+            }
+    }
+
+    @Test
+    fun `today label follows the city local forecast date instead of list position`() = runTest {
+        val base = forecast()
+        val withPreviousDay = base.copy(
+            timeZoneId = "Europe/Berlin",
+            daily = listOf(
+                base.daily.first().copy(
+                    date = base.current.observedAt.toLocalDate().minusDays(1)
+                )
+            ) + base.daily
+        )
+
+        repository.forecastResult = {
+            AppResult.Success(withPreviousDay)
+        }
+
+        createViewModel()
+            .uiState
+            .test {
+                awaitItem()
+                val model = (awaitItem() as UiState.Success).data
+
+                assertTrue(model.daily.first().dayLabel is UiText.Dynamic)
+                assertEquals(
+                    UiText.Resource(R.string.today),
+                    model.daily[1].dayLabel
+                )
+                assertEquals(
+                    base.current.observedAt.toLocalDate(),
+                    model.daily[1].date
+                )
+                assertEquals("Europe/Berlin", model.timeZoneId)
             }
     }
 

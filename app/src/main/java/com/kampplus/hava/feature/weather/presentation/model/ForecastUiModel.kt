@@ -1,6 +1,8 @@
 package com.kampplus.hava.feature.weather.presentation.model
 
 import com.kampplus.hava.core.ui.text.UiText
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class ForecastUiModel(
     val cityId: Long,
@@ -10,6 +12,8 @@ data class ForecastUiModel(
     val temperatureC: Double,
     val conditionEmoji: String,
     val conditionLabel: UiText,
+    val isDay: Boolean?,
+    val timeZoneId: String?,
     val feelsLikeText: String?,
     val humidityText: String?,
     val windText: String?,
@@ -19,6 +23,7 @@ data class ForecastUiModel(
 )
 
 data class HourlyUiModel(
+    val time: LocalDateTime,
     val timeText: String,
     val emoji: String,
     val temperatureText: String,
@@ -26,6 +31,7 @@ data class HourlyUiModel(
 )
 
 data class DailyUiModel(
+    val date: LocalDate,
     val dayLabel: UiText,
     val emoji: String,
     val minText: String,

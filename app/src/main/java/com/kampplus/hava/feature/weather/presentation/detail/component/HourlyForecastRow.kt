@@ -30,7 +30,7 @@ fun HourlyForecastRow(items: List<HourlyUiModel>, modifier: Modifier = Modifier)
         items(
             items = items,
             key = {
-                it.timeText
+                it.time
             }
         ) { hour ->
 

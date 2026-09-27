@@ -13,6 +13,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -221,10 +222,21 @@ class OpenMeteoWeatherRemoteDataSourceTest {
                 0.0
             )
 
-            assertTrue(
+            assertEquals(
+                true,
                 isDay
             )
         }
+
+        assertEquals(
+            "Europe/Istanbul",
+            forecast.timeZoneId
+        )
+
+        assertEquals(
+            10_800,
+            forecast.utcOffsetSeconds
+        )
 
         assertEquals(
             listOf(
@@ -245,6 +257,13 @@ class OpenMeteoWeatherRemoteDataSourceTest {
                 .last()
                 .precipitationProbability
         )
+
+        with(forecast.hourly.last()) {
+            assertEquals(10.1, apparentTemperatureC!!, 0.0)
+            assertEquals(13.6, windSpeedKmh!!, 0.0)
+            assertEquals(0.8, precipitationMm!!, 0.0)
+            assertEquals(false, isDay)
+        }
 
         assertEquals(
             LocalDate.of(
@@ -267,6 +286,16 @@ class OpenMeteoWeatherRemoteDataSourceTest {
             0.0
         )
 
+        assertEquals(
+            LocalDateTime.of(2026, 9, 25, 6, 43),
+            forecast.daily.last().sunrise
+        )
+
+        assertEquals(
+            LocalDateTime.of(2026, 9, 25, 18, 45),
+            forecast.daily.last().sunset
+        )
+
         val url =
             server
                 .takeRequest()
@@ -277,6 +306,95 @@ class OpenMeteoWeatherRemoteDataSourceTest {
             url.queryParameter(
                 "forecast_days"
             )
+        )
+
+        assertTrue(
+            checkNotNull(url.queryParameter("hourly"))
+                .contains("wind_speed_10m")
+        )
+
+        assertTrue(
+            checkNotNull(url.queryParameter("daily"))
+                .contains("sunset")
+        )
+    }
+
+    @Test
+    fun `missing day state stays unknown instead of defaulting to daytime`() = runTest {
+        server.enqueue(
+            MockResponse().setBody(
+                """
+                    {
+                      "latitude":52.52,
+                      "longitude":13.41,
+                      "timezone":"Europe/Berlin",
+                      "current": {
+                        "time":"2026-10-25T02:30",
+                        "temperature_2m":9.0,
+                        "weather_code":3
+                      }
+                    }
+                """.trimIndent()
+            )
+        )
+
+        val result = dataSource.getCurrentWeather(
+            listOf(ankara)
+        )
+
+        assertNull(result.single().current.isDay)
+    }
+
+    @Test
+    fun `forecast preserves city timezone and utc offset across daylight saving transition`() = runTest {
+        server.enqueue(
+            MockResponse().setBody(
+                """
+                    {
+                      "latitude":52.52,
+                      "longitude":13.41,
+                      "utc_offset_seconds":3600,
+                      "timezone":"Europe/Berlin",
+                      "current": {
+                        "time":"2026-10-25T02:30",
+                        "temperature_2m":9.0,
+                        "weather_code":3,
+                        "is_day":0
+                      },
+                      "hourly": {
+                        "time":["2026-10-25T02:00","not-a-time","2026-10-26T02:00"],
+                        "temperature_2m":[9.1,9.0,7.4],
+                        "weather_code":[3,3,2]
+                      },
+                      "daily": {
+                        "time":["2026-10-25","not-a-date","2026-10-26"],
+                        "temperature_2m_max":[12.0,11.0,10.0],
+                        "temperature_2m_min":[7.0,6.0,5.0],
+                        "weather_code":[3,3,2]
+                      }
+                    }
+                """.trimIndent()
+            )
+        )
+
+        val forecast = dataSource.getForecast(ankara)
+
+        assertEquals("Europe/Berlin", forecast.timeZoneId)
+        assertEquals(3_600, forecast.utcOffsetSeconds)
+        assertEquals(LocalDateTime.of(2026, 10, 25, 2, 30), forecast.current.observedAt)
+        assertEquals(
+            listOf(
+                LocalDateTime.of(2026, 10, 25, 2, 0),
+                LocalDateTime.of(2026, 10, 26, 2, 0)
+            ),
+            forecast.hourly.map { it.time }
+        )
+        assertEquals(
+            listOf(
+                LocalDate.of(2026, 10, 25),
+                LocalDate.of(2026, 10, 26)
+            ),
+            forecast.daily.map { it.date }
         )
     }
 

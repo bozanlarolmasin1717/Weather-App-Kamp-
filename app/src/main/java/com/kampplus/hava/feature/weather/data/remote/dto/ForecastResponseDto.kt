@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 data class ForecastResponseDto(
     val latitude: Double,
     val longitude: Double,
+    @SerialName("utc_offset_seconds")
+    val utcOffsetSeconds: Int? = null,
+    val timezone: String? = null,
     val current: CurrentDto? = null,
     val hourly: HourlyDto? = null,
     val daily: DailyDto? = null
@@ -38,6 +41,17 @@ data class HourlyDto(
     val weatherCode: List<Int?> = emptyList(),
     @SerialName("precipitation_probability")
     val precipitationProbability: List<Int?> =
+        emptyList(),
+    @SerialName("apparent_temperature")
+    val apparentTemperature: List<Double?> =
+        emptyList(),
+    @SerialName("wind_speed_10m")
+    val windSpeed: List<Double?> =
+        emptyList(),
+    val precipitation: List<Double?> =
+        emptyList(),
+    @SerialName("is_day")
+    val isDay: List<Int?> =
         emptyList()
 )
 
@@ -54,5 +68,9 @@ data class DailyDto(
         emptyList(),
     @SerialName("precipitation_probability_max")
     val precipitationProbabilityMax: List<Int?> =
+        emptyList(),
+    val sunrise: List<String?> =
+        emptyList(),
+    val sunset: List<String?> =
         emptyList()
 )

@@ -29,7 +29,9 @@ fun ForecastResponseDto.toForecast(): Forecast = Forecast(
     daily =
     daily
         ?.toDomain()
-        .orEmpty()
+        .orEmpty(),
+    timeZoneId = timezone,
+    utcOffsetSeconds = utcOffsetSeconds
 )
 
 fun CurrentDto.toDomain() = CurrentWeather(
@@ -50,7 +52,9 @@ fun CurrentDto.toDomain() = CurrentWeather(
     windSpeedKmh =
     windSpeed,
     isDay =
-    isDay != 0
+    isDay?.let {
+        it != 0
+    }
 )
 
 fun HourlyDto.toDomain(): List<HourlyForecast> = time.indices
@@ -66,18 +70,37 @@ fun HourlyDto.toDomain(): List<HourlyForecast> = time.indices
                 .getOrNull(index)
                 ?: return@mapNotNull null
 
+        val parsedTime =
+            time
+                .getOrNull(index)
+                ?.let(::parseDateTimeOrNull)
+                ?: return@mapNotNull null
+
         HourlyForecast(
             time =
-            LocalDateTime.parse(
-                time[index]
-            ),
+            parsedTime,
             temperatureC =
             temperature,
             weatherCode =
             WeatherCode(code),
             precipitationProbability =
             precipitationProbability
+                .getOrNull(index),
+            apparentTemperatureC =
+            apparentTemperature
+                .getOrNull(index),
+            windSpeedKmh =
+            windSpeed
+                .getOrNull(index),
+            precipitationMm =
+            precipitation
+                .getOrNull(index),
+            isDay =
+            isDay
                 .getOrNull(index)
+                ?.let {
+                    it != 0
+                }
         )
     }
 
@@ -99,11 +122,15 @@ fun DailyDto.toDomain(): List<DailyForecast> = time.indices
                 .getOrNull(index)
                 ?: return@mapNotNull null
 
+        val parsedDate =
+            time
+                .getOrNull(index)
+                ?.let(::parseDateOrNull)
+                ?: return@mapNotNull null
+
         DailyForecast(
             date =
-            LocalDate.parse(
-                time[index]
-            ),
+            parsedDate,
             minTemperatureC =
             min,
             maxTemperatureC =
@@ -112,6 +139,22 @@ fun DailyDto.toDomain(): List<DailyForecast> = time.indices
             WeatherCode(code),
             precipitationProbability =
             precipitationProbabilityMax
+                .getOrNull(index),
+            sunrise =
+            sunrise
                 .getOrNull(index)
+                ?.let(::parseDateTimeOrNull),
+            sunset =
+            sunset
+                .getOrNull(index)
+                ?.let(::parseDateTimeOrNull)
         )
     }
+
+private fun parseDateTimeOrNull(value: String): LocalDateTime? = runCatching {
+    LocalDateTime.parse(value)
+}.getOrNull()
+
+private fun parseDateOrNull(value: String): LocalDate? = runCatching {
+    LocalDate.parse(value)
+}.getOrNull()

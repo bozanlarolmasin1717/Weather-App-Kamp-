@@ -97,10 +97,10 @@ class OpenMeteoWeatherRemoteDataSource @Inject constructor(
             "temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day"
 
         const val HOURLY_FIELDS =
-            "temperature_2m,weather_code,precipitation_probability"
+            "temperature_2m,apparent_temperature,weather_code,precipitation_probability,precipitation,wind_speed_10m,is_day"
 
         const val DAILY_FIELDS =
-            "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+            "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset"
 
         const val FORECAST_DAYS =
             7
