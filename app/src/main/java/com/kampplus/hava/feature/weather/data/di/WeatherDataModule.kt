@@ -12,9 +12,11 @@ import com.kampplus.hava.feature.weather.data.remote.api.OpenMeteoForecastApi
 import com.kampplus.hava.feature.weather.data.remote.api.OpenMeteoGeocodingApi
 import com.kampplus.hava.feature.weather.data.repository.CityRepositoryImpl
 import com.kampplus.hava.feature.weather.data.repository.WeatherRepositoryImpl
+import com.kampplus.hava.feature.weather.domain.policy.DailyWeatherTimelineGenerator
 import com.kampplus.hava.feature.weather.domain.policy.RuleBasedWeatherInsightGenerator
 import com.kampplus.hava.feature.weather.domain.policy.WeatherConditionClassifier
 import com.kampplus.hava.feature.weather.domain.policy.WeatherInsightGenerator
+import com.kampplus.hava.feature.weather.domain.policy.WeatherTimelineGenerator
 import com.kampplus.hava.feature.weather.domain.policy.WmoWeatherConditionClassifier
 import com.kampplus.hava.feature.weather.domain.repository.CityRepository
 import com.kampplus.hava.feature.weather.domain.repository.WeatherRepository
@@ -54,6 +56,9 @@ abstract class WeatherDataModule {
 
     @Binds
     abstract fun bindWeatherInsightGenerator(impl: RuleBasedWeatherInsightGenerator): WeatherInsightGenerator
+
+    @Binds
+    abstract fun bindWeatherTimelineGenerator(impl: DailyWeatherTimelineGenerator): WeatherTimelineGenerator
 
     companion object {
 
