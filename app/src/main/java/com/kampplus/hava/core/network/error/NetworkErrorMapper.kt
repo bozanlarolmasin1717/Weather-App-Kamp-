@@ -9,37 +9,33 @@ import retrofit2.HttpException
 
 class NetworkErrorMapper @Inject constructor() : ErrorMapper {
 
-    override fun map(
-        throwable: Throwable
-    ): AppError =
-        when (throwable) {
+    override fun map(throwable: Throwable): AppError = when (throwable) {
+        is IOException ->
+            AppError.Network
 
-            is IOException ->
-                AppError.Network
-
-            is HttpException ->
-                if (
-                    throwable.code() ==
-                    HTTP_NOT_FOUND
-                ) {
-                    AppError.NotFound
-                } else {
-                    AppError.Server(
-                        throwable.code()
-                    )
-                }
-
-            is SerializationException ->
-                AppError.Parse
-
-            is NoSuchElementException ->
+        is HttpException ->
+            if (
+                throwable.code() ==
+                HTTP_NOT_FOUND
+            ) {
                 AppError.NotFound
-
-            else ->
-                AppError.Unknown(
-                    throwable
+            } else {
+                AppError.Server(
+                    throwable.code()
                 )
-        }
+            }
+
+        is SerializationException ->
+            AppError.Parse
+
+        is NoSuchElementException ->
+            AppError.NotFound
+
+        else ->
+            AppError.Unknown(
+                throwable
+            )
+    }
 
     private companion object {
         const val HTTP_NOT_FOUND = 404

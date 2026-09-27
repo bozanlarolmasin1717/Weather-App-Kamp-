@@ -18,21 +18,16 @@ import androidx.compose.ui.text.input.ImeAction
 import com.kampplus.hava.R
 
 @Composable
-fun CitySearchField(
-    query: String,
-    onQueryChange:
-        (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun CitySearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
     val focusManager =
         LocalFocusManager.current
 
     OutlinedTextField(
         value = query,
         onValueChange =
-            onQueryChange,
+        onQueryChange,
         modifier =
-            modifier.fillMaxWidth(),
+        modifier.fillMaxWidth(),
         placeholder = {
             Text(
                 stringResource(
@@ -44,11 +39,10 @@ fun CitySearchField(
             Icon(
                 Icons.Filled.Search,
                 contentDescription =
-                    null
+                null
             )
         },
         trailingIcon = {
-
             if (
                 query.isNotEmpty()
             ) {
@@ -60,26 +54,26 @@ fun CitySearchField(
                     Icon(
                         Icons.Filled.Clear,
                         contentDescription =
-                            stringResource(
-                                R.string
-                                    .action_clear
-                            )
+                        stringResource(
+                            R.string
+                                .action_clear
+                        )
                     )
                 }
             }
         },
         singleLine = true,
         keyboardOptions =
-            KeyboardOptions(
-                imeAction =
-                    ImeAction.Search
-            ),
+        KeyboardOptions(
+            imeAction =
+            ImeAction.Search
+        ),
         keyboardActions =
-            KeyboardActions(
-                onSearch = {
-                    focusManager
-                        .clearFocus()
-                }
-            )
+        KeyboardActions(
+            onSearch = {
+                focusManager
+                    .clearFocus()
+            }
+        )
     )
 }

@@ -12,13 +12,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 
 @Composable
-fun BottomBar(
-    currentDestination:
-    NavDestination?,
-    onNavigate:
-        (TopLevelDestination) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun BottomBar(currentDestination: NavDestination?, onNavigate: (TopLevelDestination) -> Unit, modifier: Modifier = Modifier) {
     NavigationBar(
         modifier = modifier
     ) {
@@ -28,10 +22,10 @@ fun BottomBar(
 
                 NavigationBarItem(
                     selected =
-                        currentDestination
-                            .isOn(
-                                destination
-                            ),
+                    currentDestination
+                        .isOn(
+                            destination
+                        ),
                     onClick = {
                         onNavigate(
                             destination
@@ -41,7 +35,7 @@ fun BottomBar(
                         Icon(
                             destination.icon,
                             contentDescription =
-                                null
+                            null
                         )
                     },
                     label = {
@@ -57,15 +51,11 @@ fun BottomBar(
     }
 }
 
-fun NavDestination?.isOn(
-    destination:
-    TopLevelDestination
-): Boolean =
-    this
-        ?.hierarchy
-        ?.any {
-            it.hasRoute(
-                destination
-                    .routeClass
-            )
-        } == true
+fun NavDestination?.isOn(destination: TopLevelDestination): Boolean = this
+    ?.hierarchy
+    ?.any {
+        it.hasRoute(
+            destination
+                .routeClass
+        )
+    } == true

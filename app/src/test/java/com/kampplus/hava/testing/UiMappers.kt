@@ -4,12 +4,11 @@ import com.kampplus.hava.feature.weather.domain.policy.WmoWeatherConditionClassi
 import com.kampplus.hava.feature.weather.presentation.model.WeatherConditionUiRegistry
 import com.kampplus.hava.feature.weather.presentation.model.WeatherUiMapper
 
-fun testUiMapper() =
-    WeatherUiMapper(
-        conditionClassifier =
-            WmoWeatherConditionClassifier(),
-        conditionUiRegistry =
-            WeatherConditionUiRegistry(
-                emptyMap()
-            )
+fun testUiMapper() = WeatherUiMapper(
+    conditionClassifier =
+    WmoWeatherConditionClassifier(),
+    conditionUiRegistry =
+    WeatherConditionUiRegistry(
+        emptyMap()
     )
+)

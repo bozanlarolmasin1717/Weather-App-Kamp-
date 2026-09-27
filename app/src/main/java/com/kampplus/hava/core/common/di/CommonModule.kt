@@ -18,27 +18,19 @@ import kotlinx.coroutines.Dispatchers
 abstract class CommonModule {
 
     @Binds
-    abstract fun bindErrorMapper(
-        impl: NetworkErrorMapper
-    ): ErrorMapper
+    abstract fun bindErrorMapper(impl: NetworkErrorMapper): ErrorMapper
 
     companion object {
 
         @Provides
         @IoDispatcher
-        fun provideIoDispatcher():
-            CoroutineDispatcher =
-            Dispatchers.IO
+        fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
         @Provides
         @DefaultDispatcher
-        fun provideDefaultDispatcher():
-            CoroutineDispatcher =
-            Dispatchers.Default
+        fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
         @Provides
-        fun provideClock():
-            Clock =
-            Clock.systemDefaultZone()
+        fun provideClock(): Clock = Clock.systemDefaultZone()
     }
 }

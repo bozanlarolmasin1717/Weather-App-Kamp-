@@ -28,7 +28,6 @@ class FavoriteCityDaoTest {
 
     @Before
     fun setUp() {
-
         val context =
             ApplicationProvider
                 .getApplicationContext<
@@ -55,112 +54,101 @@ class FavoriteCityDaoTest {
     }
 
     @Test
-    fun observeAll_returnsMostRecentlyAddedFirst() =
-        runTest {
-
-            dao.upsert(
-                city(
-                    id = 1,
-                    addedAt = 1_000
-                )
+    fun observeAll_returnsMostRecentlyAddedFirst() = runTest {
+        dao.upsert(
+            city(
+                id = 1,
+                addedAt = 1_000
             )
-
-            dao.upsert(
-                city(
-                    id = 2,
-                    addedAt = 2_000
-                )
-            )
-
-            assertEquals(
-                listOf(
-                    2L,
-                    1L
-                ),
-                dao.observeAll()
-                    .first()
-                    .map {
-                        it.id
-                    }
-            )
-        }
-
-    @Test
-    fun upsert_replacesExistingRowWithSameId() =
-        runTest {
-
-            dao.upsert(
-                city(
-                    id = 1,
-                    addedAt = 1_000,
-                    name = "Eski"
-                )
-            )
-
-            dao.upsert(
-                city(
-                    id = 1,
-                    addedAt = 2_000,
-                    name = "Yeni"
-                )
-            )
-
-            val all =
-                dao.observeAll()
-                    .first()
-
-            assertEquals(
-                1,
-                all.size
-            )
-
-            assertEquals(
-                "Yeni",
-                all.single().name
-            )
-        }
-
-    @Test
-    fun deleteById_removesRow() =
-        runTest {
-
-            dao.upsert(
-                city(
-                    id = 1,
-                    addedAt = 1_000
-                )
-            )
-
-            assertTrue(
-                dao.exists(1)
-            )
-
-            dao.deleteById(1)
-
-            assertFalse(
-                dao.exists(1)
-            )
-
-            assertTrue(
-                dao.observeAll()
-                    .first()
-                    .isEmpty()
-            )
-        }
-
-    private fun city(
-        id: Long,
-        addedAt: Long,
-        name: String = "Ankara"
-    ) =
-        FavoriteCityEntity(
-            id = id,
-            name = name,
-            region = "Ankara",
-            country = "Türkiye",
-            latitude = 39.92,
-            longitude = 32.85,
-            addedAtEpochMillis =
-                addedAt
         )
+
+        dao.upsert(
+            city(
+                id = 2,
+                addedAt = 2_000
+            )
+        )
+
+        assertEquals(
+            listOf(
+                2L,
+                1L
+            ),
+            dao.observeAll()
+                .first()
+                .map {
+                    it.id
+                }
+        )
+    }
+
+    @Test
+    fun upsert_replacesExistingRowWithSameId() = runTest {
+        dao.upsert(
+            city(
+                id = 1,
+                addedAt = 1_000,
+                name = "Eski"
+            )
+        )
+
+        dao.upsert(
+            city(
+                id = 1,
+                addedAt = 2_000,
+                name = "Yeni"
+            )
+        )
+
+        val all =
+            dao.observeAll()
+                .first()
+
+        assertEquals(
+            1,
+            all.size
+        )
+
+        assertEquals(
+            "Yeni",
+            all.single().name
+        )
+    }
+
+    @Test
+    fun deleteById_removesRow() = runTest {
+        dao.upsert(
+            city(
+                id = 1,
+                addedAt = 1_000
+            )
+        )
+
+        assertTrue(
+            dao.exists(1)
+        )
+
+        dao.deleteById(1)
+
+        assertFalse(
+            dao.exists(1)
+        )
+
+        assertTrue(
+            dao.observeAll()
+                .first()
+                .isEmpty()
+        )
+    }
+
+    private fun city(id: Long, addedAt: Long, name: String = "Ankara") = FavoriteCityEntity(
+        id = id,
+        name = name,
+        region = "Ankara",
+        country = "Türkiye",
+        latitude = 39.92,
+        longitude = 32.85,
+        addedAtEpochMillis =
+        addedAt
+    )
 }

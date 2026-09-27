@@ -22,7 +22,6 @@ class OpenMeteoCityRemoteDataSourceTest {
 
     @Before
     fun setUp() {
-
         server.start()
 
         val api =
@@ -56,102 +55,98 @@ class OpenMeteoCityRemoteDataSourceTest {
     }
 
     @Test
-    fun `maps geocoding results to cities with turkish names`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        checkNotNull(
-                            javaClass
-                                .classLoader
-                                ?.getResource(
-                                    "geocoding_berlin.json"
-                                )
-                        )
-                            .readText()
+    fun `maps geocoding results to cities with turkish names`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    checkNotNull(
+                        javaClass
+                            .classLoader
+                            ?.getResource(
+                                "geocoding_berlin.json"
+                            )
                     )
-            )
-
-            val cities =
-                dataSource.search(
-                    "Berlin"
+                        .readText()
                 )
+        )
 
-            assertEquals(
-                listOf(
-                    2950159L,
-                    4348460L
-                ),
-                cities.map {
-                    it.id
-                }
+        val cities =
+            dataSource.search(
+                "Berlin"
             )
 
-            assertEquals(
-                "Almanya",
-                cities
-                    .first()
-                    .country
-            )
+        assertEquals(
+            listOf(
+                2950159L,
+                4348460L
+            ),
+            cities.map {
+                it.id
+            }
+        )
 
-            assertEquals(
-                "Maryland",
-                cities
-                    .last()
-                    .region
-            )
+        assertEquals(
+            "Almanya",
+            cities
+                .first()
+                .country
+        )
 
-            assertEquals(
-                52.52437,
-                cities
-                    .first()
-                    .coordinates
-                    .latitude,
-                0.0
-            )
+        assertEquals(
+            "Maryland",
+            cities
+                .last()
+                .region
+        )
 
-            val url =
-                server
-                    .takeRequest()
-                    .requestUrl!!
+        assertEquals(
+            52.52437,
+            cities
+                .first()
+                .coordinates
+                .latitude,
+            0.0
+        )
 
-            assertEquals(
-                "Berlin",
-                url.queryParameter(
-                    "name"
-                )
-            )
+        val url =
+            server
+                .takeRequest()
+                .requestUrl!!
 
-            assertEquals(
-                "tr",
-                url.queryParameter(
-                    "language"
-                )
+        assertEquals(
+            "Berlin",
+            url.queryParameter(
+                "name"
             )
-        }
+        )
+
+        assertEquals(
+            "tr",
+            url.queryParameter(
+                "language"
+            )
+        )
+    }
 
     @Test
-    fun `missing results field means no match`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        """
+    fun `missing results field means no match`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    """
                         {
                           "generationtime_ms": 0.04
                         }
-                        """.trimIndent()
-                    )
-            )
+                    """.trimIndent()
+                )
+        )
 
-            assertTrue(
-                dataSource
-                    .search(
-                        "xqzw"
-                    )
-                    .isEmpty()
-            )
-        }
+        assertTrue(
+            dataSource
+                .search(
+                    "xqzw"
+                )
+                .isEmpty()
+        )
+    }
 }

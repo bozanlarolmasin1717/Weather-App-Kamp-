@@ -37,8 +37,7 @@ data class HourlyDto(
     @SerialName("weather_code")
     val weatherCode: List<Int?> = emptyList(),
     @SerialName("precipitation_probability")
-    val precipitationProbability:
-    List<Int?> =
+    val precipitationProbability: List<Int?> =
         emptyList()
 )
 
@@ -48,15 +47,12 @@ data class DailyDto(
     @SerialName("weather_code")
     val weatherCode: List<Int?> = emptyList(),
     @SerialName("temperature_2m_max")
-    val temperatureMax:
-    List<Double?> =
+    val temperatureMax: List<Double?> =
         emptyList(),
     @SerialName("temperature_2m_min")
-    val temperatureMin:
-    List<Double?> =
+    val temperatureMin: List<Double?> =
         emptyList(),
     @SerialName("precipitation_probability_max")
-    val precipitationProbabilityMax:
-    List<Int?> =
+    val precipitationProbabilityMax: List<Int?> =
         emptyList()
 )

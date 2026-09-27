@@ -13,8 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,17 +33,13 @@ import com.kampplus.hava.feature.favorites.presentation.component.FavoriteCityCa
 )
 @Composable
 fun FavoritesScreen(
-    uiState:
-    UiState<
+    uiState: UiState<
         List<FavoriteCityUiModel>
         >,
-    onCityClick:
-        (Long) -> Unit,
-    onRemoveFavorite:
-        (Long) -> Unit,
+    onCityClick: (Long) -> Unit,
+    onRemoveFavorite: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    snackbarHostState:
-    SnackbarHostState =
+    snackbarHostState: SnackbarHostState =
         remember {
             SnackbarHostState()
         }
@@ -71,62 +67,61 @@ fun FavoritesScreen(
 
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(
-                        innerPadding
-                    ),
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    innerPadding
+                ),
             contentAlignment =
-                Alignment.Center
+            Alignment.Center
         ) {
             when (uiState) {
-
                 UiState.Loading ->
                     LoadingView()
 
                 UiState.Empty ->
                     EmptyView(
                         icon =
-                            Icons.Filled
-                                .FavoriteBorder,
+                        Icons.Filled
+                            .FavoriteBorder,
                         title =
-                            stringResource(
-                                R.string
-                                    .favorites_empty_title
-                            ),
+                        stringResource(
+                            R.string
+                                .favorites_empty_title
+                        ),
                         message =
-                            stringResource(
-                                R.string
-                                    .favorites_empty_message
-                            )
+                        stringResource(
+                            R.string
+                                .favorites_empty_message
+                        )
                     )
 
                 is UiState.Error ->
                     ErrorView(
                         message =
-                            uiState
-                                .message
-                                .asString()
+                        uiState
+                            .message
+                            .asString()
                     )
 
                 is UiState.Success ->
                     LazyColumn(
                         modifier =
-                            Modifier
-                                .fillMaxSize(),
+                        Modifier
+                            .fillMaxSize(),
                         contentPadding =
-                            PaddingValues(
-                                16.dp
-                            ),
+                        PaddingValues(
+                            16.dp
+                        ),
                         verticalArrangement =
-                            Arrangement
-                                .spacedBy(
-                                    12.dp
-                                )
+                        Arrangement
+                            .spacedBy(
+                                12.dp
+                            )
                     ) {
                         items(
                             items =
-                                uiState.data,
+                            uiState.data,
                             key = {
                                 it.id
                             }

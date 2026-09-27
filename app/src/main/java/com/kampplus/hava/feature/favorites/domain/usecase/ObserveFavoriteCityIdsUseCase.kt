@@ -7,21 +7,18 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class ObserveFavoriteCityIdsUseCase @Inject constructor(
-    private val repository:
-    FavoriteCityRepository
+    private val repository: FavoriteCityRepository
 ) {
 
-    operator fun invoke():
-        Flow<Set<Long>> =
-        repository
-            .observeFavorites()
-            .map { favorites ->
+    operator fun invoke(): Flow<Set<Long>> = repository
+        .observeFavorites()
+        .map { favorites ->
 
-                favorites.mapTo(
-                    mutableSetOf()
-                ) {
-                    it.id
-                }
+            favorites.mapTo(
+                mutableSetOf()
+            ) {
+                it.id
             }
-            .distinctUntilChanged()
+        }
+        .distinctUntilChanged()
 }

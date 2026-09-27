@@ -5,13 +5,11 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 
 data class CityListUiState(
     val query: String = "",
-    val content:
-    UiState<
+    val content: UiState<
         List<CityWeatherUiModel>
         > =
         UiState.Loading,
-    val isRefreshing:
-    Boolean =
+    val isRefreshing: Boolean =
         false
 ) {
 

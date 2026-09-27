@@ -130,10 +130,7 @@ fun ForecastDetailScreen(
 }
 
 @Composable
-private fun ForecastContent(
-    forecast: ForecastUiModel,
-    modifier: Modifier = Modifier
-) {
+private fun ForecastContent(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -189,10 +186,7 @@ private fun ForecastContent(
 }
 
 @Composable
-private fun CurrentWeatherHeader(
-    forecast: ForecastUiModel,
-    modifier: Modifier = Modifier
-) {
+private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(
@@ -270,10 +264,7 @@ private fun CurrentWeatherHeader(
 }
 
 @Composable
-private fun Metric(
-    label: String,
-    value: String
-) {
+private fun Metric(label: String, value: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -291,9 +282,7 @@ private fun Metric(
 }
 
 @Composable
-private fun SectionTitle(
-    text: String
-) {
+private fun SectionTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,

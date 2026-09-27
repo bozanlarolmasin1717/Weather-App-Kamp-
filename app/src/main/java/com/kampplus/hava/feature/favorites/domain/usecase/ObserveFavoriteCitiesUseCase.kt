@@ -6,11 +6,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class ObserveFavoriteCitiesUseCase @Inject constructor(
-    private val repository:
-    FavoriteCityRepository
+    private val repository: FavoriteCityRepository
 ) {
 
-    operator fun invoke():
-        Flow<List<FavoriteCity>> =
-        repository.observeFavorites()
+    operator fun invoke(): Flow<List<FavoriteCity>> = repository.observeFavorites()
 }

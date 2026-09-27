@@ -17,47 +17,36 @@ sealed interface UiText {
         vararg val args: Any
     ) : UiText {
 
-        override fun equals(
-            other: Any?
-        ): Boolean =
-            other is Resource &&
-                other.resId == resId &&
-                other.args.contentEquals(
-                    args
-                )
+        override fun equals(other: Any?): Boolean = other is Resource &&
+            other.resId == resId &&
+            other.args.contentEquals(
+                args
+            )
 
-        override fun hashCode():
-            Int =
-            31 * resId +
-                args.contentHashCode()
+        override fun hashCode(): Int = 31 * resId +
+            args.contentHashCode()
     }
 
     @Composable
-    fun asString(): String =
-        when (this) {
+    fun asString(): String = when (this) {
+        is Dynamic ->
+            value
 
-            is Dynamic ->
-                value
+        is Resource ->
+            stringResource(
+                resId,
+                *args
+            )
+    }
 
-            is Resource ->
-                stringResource(
-                    resId,
-                    *args
-                )
-        }
+    fun asString(resources: Resources): String = when (this) {
+        is Dynamic ->
+            value
 
-    fun asString(
-        resources: Resources
-    ): String =
-        when (this) {
-
-            is Dynamic ->
-                value
-
-            is Resource ->
-                resources.getString(
-                    resId,
-                    *args
-                )
-        }
+        is Resource ->
+            resources.getString(
+                resId,
+                *args
+            )
+    }
 }

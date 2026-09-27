@@ -15,19 +15,18 @@ import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 fun ForecastDetailRoute(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel:
-    ForecastDetailViewModel =
+    viewModel: ForecastDetailViewModel =
         hiltViewModel()
 ) {
     val uiState by
-    viewModel
-        .uiState
-        .collectAsStateWithLifecycle()
+        viewModel
+            .uiState
+            .collectAsStateWithLifecycle()
 
     val isRefreshing by
-    viewModel
-        .isRefreshing
-        .collectAsStateWithLifecycle()
+        viewModel
+            .isRefreshing
+            .collectAsStateWithLifecycle()
 
     val context =
         LocalContext.current
@@ -41,20 +40,18 @@ fun ForecastDetailRoute(
             )
         },
         onFavoriteClick =
-            viewModel::onToggleFavorite,
+        viewModel::onToggleFavorite,
         onRetry =
-            viewModel::onRetry,
+        viewModel::onRetry,
         onRefresh =
-            viewModel::onRefresh,
+        viewModel::onRefresh,
         isRefreshing =
-            isRefreshing,
+        isRefreshing,
         modifier = modifier
     )
 }
 
-private fun Context.shareForecast(
-    forecast: ForecastUiModel
-) {
+private fun Context.shareForecast(forecast: ForecastUiModel) {
     val text =
         getString(
             R.string.share_text,

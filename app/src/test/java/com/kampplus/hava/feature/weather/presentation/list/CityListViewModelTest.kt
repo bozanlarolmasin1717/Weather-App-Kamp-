@@ -41,408 +41,396 @@ class CityListViewModelTest {
             InMemoryFavoriteCityDataSource()
         )
 
-    private fun createViewModel() =
-        CityListViewModel(
-            getCityWeathers =
-                GetCityWeathersUseCase(repository),
-            searchCityWeathers =
-                SearchCityWeathersUseCase(
-                    cityRepository,
-                    repository
-                ),
-            observeFavoriteCityIds =
-                ObserveFavoriteCityIdsUseCase(
-                    favoritesRepository
-                ),
-            toggleFavoriteCity =
-                ToggleFavoriteCityUseCase(
-                    favoritesRepository
-                ),
-            uiMapper =
-                testUiMapper()
-        )
+    private fun createViewModel() = CityListViewModel(
+        getCityWeathers =
+        GetCityWeathersUseCase(repository),
+        searchCityWeathers =
+        SearchCityWeathersUseCase(
+            cityRepository,
+            repository
+        ),
+        observeFavoriteCityIds =
+        ObserveFavoriteCityIdsUseCase(
+            favoritesRepository
+        ),
+        toggleFavoriteCity =
+        ToggleFavoriteCityUseCase(
+            favoritesRepository
+        ),
+        uiMapper =
+        testUiMapper()
+    )
 
     @Test
-    fun `emits loading then formatted city weathers`() =
-        runTest {
-            repository.cityWeathersResult = {
-                AppResult.Success(
-                    listOf(
-                        cityWeather(
-                            city = city(
-                                name = "İzmir",
-                                region = "İzmir"
-                            ),
-                            temperatureC = 26.6
+    fun `emits loading then formatted city weathers`() = runTest {
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                listOf(
+                    cityWeather(
+                        city = city(
+                            name = "İzmir",
+                            region = "İzmir"
+                        ),
+                        temperatureC = 26.6
+                    )
+                )
+            )
+        }
+
+        createViewModel()
+            .uiState
+            .map { it.content }
+            .test {
+                assertEquals(
+                    UiState.Loading,
+                    awaitItem()
+                )
+
+                val item =
+                    (awaitItem() as UiState.Success)
+                        .data
+                        .single()
+
+                assertEquals(
+                    "İzmir",
+                    item.title
+                )
+
+                assertEquals(
+                    "İzmir, Türkiye",
+                    item.subtitle
+                )
+
+                assertEquals(
+                    "27°",
+                    item.temperatureText
+                )
+            }
+    }
+
+    @Test
+    fun `emits empty when there is no city`() = runTest {
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                emptyList()
+            )
+        }
+
+        createViewModel()
+            .uiState
+            .map { it.content }
+            .test {
+                assertEquals(
+                    UiState.Loading,
+                    awaitItem()
+                )
+
+                assertEquals(
+                    UiState.Empty,
+                    awaitItem()
+                )
+            }
+    }
+
+    @Test
+    fun `emits error when repository fails`() = runTest {
+        repository.cityWeathersResult = {
+            AppResult.Failure(
+                AppError.Network
+            )
+        }
+
+        createViewModel()
+            .uiState
+            .map { it.content }
+            .test {
+                assertEquals(
+                    UiState.Loading,
+                    awaitItem()
+                )
+
+                assertTrue(
+                    awaitItem() is UiState.Error
+                )
+            }
+    }
+
+    @Test
+    fun `search waits for debounce and shows matching cities`() = runTest {
+        cityRepository.searchResult = {
+            AppResult.Success(
+                listOf(
+                    city(
+                        id = 2950159,
+                        name = "Berlin",
+                        region = "Berlin",
+                        country = "Almanya"
+                    )
+                )
+            )
+        }
+
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                listOf(
+                    cityWeather()
+                )
+            )
+        }
+
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        viewModel.onQueryChange(
+            "Berl"
+        )
+
+        advanceTimeBy(
+            CityListViewModel.SEARCH_DEBOUNCE_MS - 1
+        )
+
+        runCurrent()
+
+        assertTrue(
+            cityRepository.queries.isEmpty()
+        )
+
+        advanceTimeBy(2)
+        runCurrent()
+
+        assertEquals(
+            listOf("Berl"),
+            cityRepository.queries
+        )
+
+        val state =
+            viewModel.uiState.value
+
+        assertTrue(
+            state.isSearching
+        )
+
+        assertEquals(
+            listOf("Berlin"),
+            (state.content as UiState.Success)
+                .data
+                .map { it.title }
+        )
+    }
+
+    @Test
+    fun `typing quickly only searches the last query`() = runTest {
+        cityRepository.searchResult = {
+            AppResult.Success(
+                listOf(
+                    city()
+                )
+            )
+        }
+
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        listOf(
+            "Iz",
+            "Izm",
+            "Izmi",
+            "Izmir"
+        ).forEach { text ->
+            viewModel.onQueryChange(
+                text
+            )
+
+            advanceTimeBy(100)
+        }
+
+        advanceTimeBy(
+            CityListViewModel.SEARCH_DEBOUNCE_MS
+        )
+
+        runCurrent()
+
+        assertEquals(
+            listOf("Izmir"),
+            cityRepository.queries
+        )
+    }
+
+    @Test
+    fun `search without results shows empty state`() = runTest {
+        cityRepository.searchResult = {
+            AppResult.Success(
+                emptyList()
+            )
+        }
+
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        viewModel.onQueryChange(
+            "xqzw"
+        )
+
+        advanceTimeBy(
+            CityListViewModel.SEARCH_DEBOUNCE_MS + 1
+        )
+
+        runCurrent()
+
+        assertEquals(
+            UiState.Empty,
+            viewModel
+                .uiState
+                .value
+                .content
+        )
+    }
+
+    @Test
+    fun `clearing query returns to featured cities`() = runTest {
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                listOf(
+                    cityWeather(
+                        city = city(
+                            name = "İstanbul"
                         )
                     )
                 )
-            }
-
-            createViewModel()
-                .uiState
-                .map { it.content }
-                .test {
-                    assertEquals(
-                        UiState.Loading,
-                        awaitItem()
-                    )
-
-                    val item =
-                        (awaitItem() as UiState.Success)
-                            .data
-                            .single()
-
-                    assertEquals(
-                        "İzmir",
-                        item.title
-                    )
-
-                    assertEquals(
-                        "İzmir, Türkiye",
-                        item.subtitle
-                    )
-
-                    assertEquals(
-                        "27°",
-                        item.temperatureText
-                    )
-                }
+            )
         }
 
-    @Test
-    fun `emits empty when there is no city`() =
-        runTest {
-            repository.cityWeathersResult = {
-                AppResult.Success(
-                    emptyList()
+        cityRepository.searchResult = {
+            AppResult.Success(
+                listOf(
+                    city(
+                        name = "Berlin"
+                    )
                 )
-            }
-
-            createViewModel()
-                .uiState
-                .map { it.content }
-                .test {
-                    assertEquals(
-                        UiState.Loading,
-                        awaitItem()
-                    )
-
-                    assertEquals(
-                        UiState.Empty,
-                        awaitItem()
-                    )
-                }
+            )
         }
 
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        viewModel.onQueryChange(
+            "Berlin"
+        )
+
+        advanceTimeBy(
+            CityListViewModel.SEARCH_DEBOUNCE_MS + 1
+        )
+
+        runCurrent()
+
+        viewModel.onQueryChange("")
+        runCurrent()
+
+        assertEquals(
+            listOf("İstanbul"),
+            (
+                viewModel
+                    .uiState
+                    .value
+                    .content as UiState.Success
+                )
+                .data
+                .map { it.title }
+        )
+    }
+
     @Test
-    fun `emits error when repository fails`() =
-        runTest {
-            repository.cityWeathersResult = {
+    fun `retry after error loads the list again`() = runTest {
+        var shouldFail = true
+
+        repository.cityWeathersResult = {
+            if (shouldFail) {
                 AppResult.Failure(
                     AppError.Network
                 )
-            }
-
-            createViewModel()
-                .uiState
-                .map { it.content }
-                .test {
-                    assertEquals(
-                        UiState.Loading,
-                        awaitItem()
-                    )
-
-                    assertTrue(
-                        awaitItem() is UiState.Error
-                    )
-                }
-        }
-
-    @Test
-    fun `search waits for debounce and shows matching cities`() =
-        runTest {
-            cityRepository.searchResult = {
-                AppResult.Success(
-                    listOf(
-                        city(
-                            id = 2950159,
-                            name = "Berlin",
-                            region = "Berlin",
-                            country = "Almanya"
-                        )
-                    )
-                )
-            }
-
-            repository.cityWeathersResult = {
+            } else {
                 AppResult.Success(
                     listOf(
                         cityWeather()
                     )
                 )
             }
-
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
-
-            viewModel.onQueryChange(
-                "Berl"
-            )
-
-            advanceTimeBy(
-                CityListViewModel.SEARCH_DEBOUNCE_MS - 1
-            )
-
-            runCurrent()
-
-            assertTrue(
-                cityRepository.queries.isEmpty()
-            )
-
-            advanceTimeBy(2)
-            runCurrent()
-
-            assertEquals(
-                listOf("Berl"),
-                cityRepository.queries
-            )
-
-            val state =
-                viewModel.uiState.value
-
-            assertTrue(
-                state.isSearching
-            )
-
-            assertEquals(
-                listOf("Berlin"),
-                (state.content as UiState.Success)
-                    .data
-                    .map { it.title }
-            )
         }
+
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        assertTrue(
+            viewModel
+                .uiState
+                .value
+                .content is UiState.Error
+        )
+
+        shouldFail = false
+
+        viewModel.onRetry()
+        runCurrent()
+
+        assertTrue(
+            viewModel
+                .uiState
+                .value
+                .content is UiState.Success
+        )
+    }
 
     @Test
-    fun `typing quickly only searches the last query`() =
-        runTest {
-            cityRepository.searchResult = {
-                AppResult.Success(
-                    listOf(
-                        city()
+    fun `refresh replaces data and clears refreshing flag`() = runTest {
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                listOf(
+                    cityWeather(
+                        temperatureC = 10.0
                     )
                 )
-            }
-
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
-
-            listOf(
-                "Iz",
-                "Izm",
-                "Izmi",
-                "Izmir"
-            ).forEach { text ->
-                viewModel.onQueryChange(
-                    text
-                )
-
-                advanceTimeBy(100)
-            }
-
-            advanceTimeBy(
-                CityListViewModel.SEARCH_DEBOUNCE_MS
-            )
-
-            runCurrent()
-
-            assertEquals(
-                listOf("Izmir"),
-                cityRepository.queries
             )
         }
 
-    @Test
-    fun `search without results shows empty state`() =
-        runTest {
-            cityRepository.searchResult = {
-                AppResult.Success(
-                    emptyList()
+        val viewModel =
+            createViewModel()
+                .alsoSubscribe(this)
+
+        repository.cityWeathersResult = {
+            AppResult.Success(
+                listOf(
+                    cityWeather(
+                        temperatureC = 25.0
+                    )
                 )
-            }
-
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
-
-            viewModel.onQueryChange(
-                "xqzw"
-            )
-
-            advanceTimeBy(
-                CityListViewModel.SEARCH_DEBOUNCE_MS + 1
-            )
-
-            runCurrent()
-
-            assertEquals(
-                UiState.Empty,
-                viewModel
-                    .uiState
-                    .value
-                    .content
             )
         }
 
-    @Test
-    fun `clearing query returns to featured cities`() =
-        runTest {
-            repository.cityWeathersResult = {
-                AppResult.Success(
-                    listOf(
-                        cityWeather(
-                            city = city(
-                                name = "İstanbul"
-                            )
-                        )
-                    )
-                )
-            }
+        viewModel.onRefresh()
+        runCurrent()
 
-            cityRepository.searchResult = {
-                AppResult.Success(
-                    listOf(
-                        city(
-                            name = "Berlin"
-                        )
-                    )
-                )
-            }
+        val state =
+            viewModel.uiState.value
 
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
+        assertFalse(
+            state.isRefreshing
+        )
 
-            viewModel.onQueryChange(
-                "Berlin"
-            )
+        assertEquals(
+            "25°",
+            (state.content as UiState.Success)
+                .data
+                .single()
+                .temperatureText
+        )
+    }
 
-            advanceTimeBy(
-                CityListViewModel.SEARCH_DEBOUNCE_MS + 1
-            )
-
-            runCurrent()
-
-            viewModel.onQueryChange("")
-            runCurrent()
-
-            assertEquals(
-                listOf("İstanbul"),
-                (
-                    viewModel
-                        .uiState
-                        .value
-                        .content as UiState.Success
-                    )
-                    .data
-                    .map { it.title }
-            )
-        }
-
-    @Test
-    fun `retry after error loads the list again`() =
-        runTest {
-            var shouldFail = true
-
-            repository.cityWeathersResult = {
-                if (shouldFail) {
-                    AppResult.Failure(
-                        AppError.Network
-                    )
-                } else {
-                    AppResult.Success(
-                        listOf(
-                            cityWeather()
-                        )
-                    )
-                }
-            }
-
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
-
-            assertTrue(
-                viewModel
-                    .uiState
-                    .value
-                    .content is UiState.Error
-            )
-
-            shouldFail = false
-
-            viewModel.onRetry()
-            runCurrent()
-
-            assertTrue(
-                viewModel
-                    .uiState
-                    .value
-                    .content is UiState.Success
-            )
-        }
-
-    @Test
-    fun `refresh replaces data and clears refreshing flag`() =
-        runTest {
-            repository.cityWeathersResult = {
-                AppResult.Success(
-                    listOf(
-                        cityWeather(
-                            temperatureC = 10.0
-                        )
-                    )
-                )
-            }
-
-            val viewModel =
-                createViewModel()
-                    .alsoSubscribe(this)
-
-            repository.cityWeathersResult = {
-                AppResult.Success(
-                    listOf(
-                        cityWeather(
-                            temperatureC = 25.0
-                        )
-                    )
-                )
-            }
-
-            viewModel.onRefresh()
-            runCurrent()
-
-            val state =
-                viewModel.uiState.value
-
-            assertFalse(
-                state.isRefreshing
-            )
-
-            assertEquals(
-                "25°",
-                (state.content as UiState.Success)
-                    .data
-                    .single()
-                    .temperatureText
-            )
-        }
-
-    private fun CityListViewModel.alsoSubscribe(
-        scope: TestScope
-    ): CityListViewModel {
+    private fun CityListViewModel.alsoSubscribe(scope: TestScope): CityListViewModel {
         scope.backgroundScope.launch {
             uiState.collect {}
         }

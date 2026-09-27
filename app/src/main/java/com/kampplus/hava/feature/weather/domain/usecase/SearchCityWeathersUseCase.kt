@@ -10,53 +10,45 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
 class SearchCityWeathersUseCase @Inject constructor(
-    private val cityRepository:
-    CityRepository,
-    private val weatherRepository:
-    WeatherRepository
+    private val cityRepository: CityRepository,
+    private val weatherRepository: WeatherRepository
 ) {
 
-    operator fun invoke(
-        query: String
-    ): Flow<
+    operator fun invoke(query: String): Flow<
         AppResult<
             List<CityWeather>
             >
-        > =
-        flow {
+        > = flow {
+        when (
+            val cities =
+                cityRepository.search(
+                    query.trim()
+                )
+        ) {
+            is AppResult.Failure ->
+                emit(
+                    cities
+                )
 
-            when (
-                val cities =
-                    cityRepository.search(
-                        query.trim()
-                    )
-            ) {
-
-                is AppResult.Failure ->
+            is AppResult.Success -> {
+                if (
+                    cities.data
+                        .isEmpty()
+                ) {
                     emit(
-                        cities
+                        AppResult.Success(
+                            emptyList()
+                        )
                     )
-
-                is AppResult.Success -> {
-
-                    if (
-                        cities.data
-                            .isEmpty()
-                    ) {
-                        emit(
-                            AppResult.Success(
-                                emptyList()
+                } else {
+                    emitAll(
+                        weatherRepository
+                            .getCurrentWeather(
+                                cities.data
                             )
-                        )
-                    } else {
-                        emitAll(
-                            weatherRepository
-                                .getCurrentWeather(
-                                    cities.data
-                                )
-                        )
-                    }
+                    )
                 }
             }
         }
+    }
 }

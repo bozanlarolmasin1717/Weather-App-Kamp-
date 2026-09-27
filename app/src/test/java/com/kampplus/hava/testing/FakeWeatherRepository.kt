@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FakeWeatherRepository(
-    var cityWeathersResult:
-        () ->
+    var cityWeathersResult: () ->
     AppResult<
         List<CityWeather>
         > = {
@@ -19,8 +18,7 @@ class FakeWeatherRepository(
             emptyList()
         )
     },
-    var forecastResult:
-        (City) ->
+    var forecastResult: (City) ->
     AppResult<Forecast> = {
         AppResult.Failure(
             AppError.NotFound
@@ -31,36 +29,32 @@ class FakeWeatherRepository(
     val requestedForecasts =
         mutableListOf<City>()
 
-    override fun getCityWeathers():
-        Flow<
-            AppResult<
-                List<CityWeather>
-                >
-            > =
-        flow {
-            emit(
-                cityWeathersResult()
-            )
-        }
-
-    var currentWeatherResult:
-            (List<City>) ->
-    AppResult<
-        List<CityWeather>
-        > = { cities ->
-
-        AppResult.Success(
-            cities.map {
-                cityWeather(
-                    city = it
-                )
-            }
+    override fun getCityWeathers(): Flow<
+        AppResult<
+            List<CityWeather>
+            >
+        > = flow {
+        emit(
+            cityWeathersResult()
         )
     }
 
-    override fun getCurrentWeather(
-        cities: List<City>
-    ): Flow<
+    var currentWeatherResult:
+        (List<City>) ->
+        AppResult<
+            List<CityWeather>
+            > = { cities ->
+
+            AppResult.Success(
+                cities.map {
+                    cityWeather(
+                        city = it
+                    )
+                }
+            )
+        }
+
+    override fun getCurrentWeather(cities: List<City>): Flow<
         AppResult<
             List<CityWeather>
             >
@@ -73,10 +67,7 @@ class FakeWeatherRepository(
             )
         }
 
-    override suspend fun getForecast(
-        city: City
-    ): AppResult<Forecast> {
-
+    override suspend fun getForecast(city: City): AppResult<Forecast> {
         requestedForecasts +=
             city
 

@@ -5,18 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface FavoriteCityLocalDataSource {
 
-    fun observeAll():
-        Flow<List<FavoriteCity>>
+    fun observeAll(): Flow<List<FavoriteCity>>
 
-    suspend fun contains(
-        id: Long
-    ): Boolean
+    suspend fun contains(id: Long): Boolean
 
-    suspend fun upsert(
-        city: FavoriteCity
-    )
+    suspend fun upsert(city: FavoriteCity)
 
-    suspend fun delete(
-        id: Long
-    )
+    suspend fun delete(id: Long)
 }

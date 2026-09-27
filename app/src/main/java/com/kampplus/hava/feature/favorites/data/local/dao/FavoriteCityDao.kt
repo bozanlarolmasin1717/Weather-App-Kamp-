@@ -12,25 +12,18 @@ interface FavoriteCityDao {
     @Query(
         "SELECT * FROM favorite_cities ORDER BY added_at DESC"
     )
-    fun observeAll():
-        Flow<List<FavoriteCityEntity>>
+    fun observeAll(): Flow<List<FavoriteCityEntity>>
 
     @Query(
         "SELECT EXISTS(SELECT 1 FROM favorite_cities WHERE id = :id)"
     )
-    suspend fun exists(
-        id: Long
-    ): Boolean
+    suspend fun exists(id: Long): Boolean
 
     @Upsert
-    suspend fun upsert(
-        entity: FavoriteCityEntity
-    )
+    suspend fun upsert(entity: FavoriteCityEntity)
 
     @Query(
         "DELETE FROM favorite_cities WHERE id = :id"
     )
-    suspend fun deleteById(
-        id: Long
-    )
+    suspend fun deleteById(id: Long)
 }

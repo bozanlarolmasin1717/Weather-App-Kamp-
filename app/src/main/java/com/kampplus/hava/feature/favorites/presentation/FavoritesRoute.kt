@@ -16,17 +16,15 @@ import com.kampplus.hava.feature.favorites.domain.model.FavoriteCity
 
 @Composable
 fun FavoritesRoute(
-    onCityClick:
-        (FavoriteCity) -> Unit,
+    onCityClick: (FavoriteCity) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel:
-    FavoritesViewModel =
+    viewModel: FavoritesViewModel =
         hiltViewModel()
 ) {
     val uiState by
-    viewModel
-        .uiState
-        .collectAsStateWithLifecycle()
+        viewModel
+            .uiState
+            .collectAsStateWithLifecycle()
 
     val snackbarHostState =
         remember {
@@ -43,25 +41,23 @@ fun FavoritesRoute(
             .collect { event ->
 
                 when (event) {
-
                     is FavoritesEvent.ShowUndo -> {
-
                         val result =
                             snackbarHostState
                                 .showSnackbar(
                                     message =
-                                        resources.getString(
-                                            R.string
-                                                .favorites_removed,
-                                            event.cityName
-                                        ),
+                                    resources.getString(
+                                        R.string
+                                            .favorites_removed,
+                                        event.cityName
+                                    ),
                                     actionLabel =
-                                        resources.getString(
-                                            R.string
-                                                .action_undo
-                                        ),
+                                    resources.getString(
+                                        R.string
+                                            .action_undo
+                                    ),
                                     duration =
-                                        SnackbarDuration.Short
+                                    SnackbarDuration.Short
                                 )
 
                         if (
@@ -87,9 +83,9 @@ fun FavoritesRoute(
                 )
         },
         onRemoveFavorite =
-            viewModel::onRemoveFavorite,
+        viewModel::onRemoveFavorite,
         snackbarHostState =
-            snackbarHostState,
+        snackbarHostState,
         modifier = modifier
     )
 }

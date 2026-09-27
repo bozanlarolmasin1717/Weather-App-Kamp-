@@ -15,15 +15,13 @@ import com.kampplus.hava.core.navigation.TopLevelDestination
 import com.kampplus.hava.core.navigation.isOn
 
 @Composable
-fun HavaApp(
-    modifier: Modifier = Modifier
-) {
+fun HavaApp(modifier: Modifier = Modifier) {
     val navController =
         rememberNavController()
 
     val backStackEntry by
-    navController
-        .currentBackStackEntryAsState()
+        navController
+            .currentBackStackEntryAsState()
 
     val currentDestination =
         backStackEntry
@@ -40,13 +38,11 @@ fun HavaApp(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-
             if (isTopLevel) {
                 BottomBar(
                     currentDestination =
-                        currentDestination,
-                    onNavigate = {
-                            destination ->
+                    currentDestination,
+                    onNavigate = { destination ->
 
                         navController.navigate(
                             destination.route
@@ -75,15 +71,15 @@ fun HavaApp(
 
         HavaNavHost(
             navController =
-                navController,
+            navController,
             modifier =
-                Modifier
-                    .padding(
-                        innerPadding
-                    )
-                    .consumeWindowInsets(
-                        innerPadding
-                    )
+            Modifier
+                .padding(
+                    innerPadding
+                )
+                .consumeWindowInsets(
+                    innerPadding
+                )
         )
     }
 }

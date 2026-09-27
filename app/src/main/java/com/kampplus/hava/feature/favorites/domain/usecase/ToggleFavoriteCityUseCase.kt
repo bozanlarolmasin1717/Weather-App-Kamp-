@@ -5,28 +5,24 @@ import com.kampplus.hava.feature.favorites.domain.repository.FavoriteCityReposit
 import javax.inject.Inject
 
 class ToggleFavoriteCityUseCase @Inject constructor(
-    private val repository:
-    FavoriteCityRepository
+    private val repository: FavoriteCityRepository
 ) {
 
-    suspend operator fun invoke(
-        city: FavoriteCity
-    ): Boolean =
-        if (
-            repository.isFavorite(
-                city.id
-            )
-        ) {
-            repository.remove(
-                city.id
-            )
+    suspend operator fun invoke(city: FavoriteCity): Boolean = if (
+        repository.isFavorite(
+            city.id
+        )
+    ) {
+        repository.remove(
+            city.id
+        )
 
-            false
-        } else {
-            repository.add(
-                city
-            )
+        false
+    } else {
+        repository.add(
+            city
+        )
 
-            true
-        }
+        true
+    }
 }

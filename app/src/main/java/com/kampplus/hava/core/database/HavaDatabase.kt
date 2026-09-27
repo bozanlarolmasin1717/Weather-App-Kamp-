@@ -14,8 +14,7 @@ import com.kampplus.hava.feature.favorites.data.local.entity.FavoriteCityEntity
 )
 abstract class HavaDatabase : RoomDatabase() {
 
-    abstract fun favoriteCityDao():
-        FavoriteCityDao
+    abstract fun favoriteCityDao(): FavoriteCityDao
 
     companion object {
         const val NAME = "hava.db"

@@ -26,8 +26,7 @@ class SearchCityWeathersUseCaseTest {
                 val default =
                     currentWeatherResult
 
-                currentWeatherResult = {
-                        cities ->
+                currentWeatherResult = { cities ->
 
                     weatherCalls++
 
@@ -44,97 +43,90 @@ class SearchCityWeathersUseCaseTest {
         )
 
     @Test
-    fun `found cities are enriched with current weather`() =
-        runTest {
-
-            cityRepository
-                .searchResult = {
-
-                AppResult.Success(
-                    listOf(
-                        city(
-                            id = 1,
-                            name = "Berlin"
-                        ),
-                        city(
-                            id = 2,
-                            name = "Bern"
-                        )
+    fun `found cities are enriched with current weather`() = runTest {
+        cityRepository
+            .searchResult = {
+            AppResult.Success(
+                listOf(
+                    city(
+                        id = 1,
+                        name = "Berlin"
+                    ),
+                    city(
+                        id = 2,
+                        name = "Bern"
                     )
                 )
-            }
-
-            val result =
-                useCase(
-                    "  Ber "
-                )
-                    .first()
-                    as AppResult.Success
-
-            assertEquals(
-                listOf(
-                    "Berlin",
-                    "Bern"
-                ),
-                result.data
-                    .map {
-                        it.city.name
-                    }
-            )
-
-            assertEquals(
-                listOf("Ber"),
-                cityRepository
-                    .queries
             )
         }
+
+        val result =
+            useCase(
+                "  Ber "
+            )
+                .first()
+                as AppResult.Success
+
+        assertEquals(
+            listOf(
+                "Berlin",
+                "Bern"
+            ),
+            result.data
+                .map {
+                    it.city.name
+                }
+        )
+
+        assertEquals(
+            listOf("Ber"),
+            cityRepository
+                .queries
+        )
+    }
 
     @Test
-    fun `no match returns empty list without calling weather api`() =
-        runTest {
-
-            cityRepository.searchResult = {
-                AppResult.Success(
-                    emptyList()
-                )
-            }
-
-            val result =
-                useCase(
-                    "xqzw"
-                )
-                    .first()
-                    as AppResult.Success
-
-            assertTrue(
-                result.data
-                    .isEmpty()
-            )
-
-            assertEquals(
-                0,
-                weatherCalls
+    fun `no match returns empty list without calling weather api`() = runTest {
+        cityRepository.searchResult = {
+            AppResult.Success(
+                emptyList()
             )
         }
+
+        val result =
+            useCase(
+                "xqzw"
+            )
+                .first()
+                as AppResult.Success
+
+        assertTrue(
+            result.data
+                .isEmpty()
+        )
+
+        assertEquals(
+            0,
+            weatherCalls
+        )
+    }
 
     @Test
-    fun `search failure is propagated`() =
-        runTest {
-
-            cityRepository.searchResult = {
-                AppResult.Failure(
-                    AppError.Network
-                )
-            }
-
-            assertEquals(
-                AppResult.Failure(
-                    AppError.Network
-                ),
-                useCase(
-                    "Ankara"
-                )
-                    .first()
+    fun `search failure is propagated`() = runTest {
+        cityRepository.searchResult = {
+            AppResult.Failure(
+                AppError.Network
             )
         }
+
+        assertEquals(
+            AppResult.Failure(
+                AppError.Network
+            ),
+            useCase(
+                "Ankara"
+            )
+                .first()
+        )
+    }
 }

@@ -77,52 +77,52 @@ class FavoritesSyncTest {
     private val listViewModel by lazy {
         CityListViewModel(
             getCityWeathers =
-                GetCityWeathersUseCase(
-                    weatherRepository
-                ),
+            GetCityWeathersUseCase(
+                weatherRepository
+            ),
             searchCityWeathers =
-                SearchCityWeathersUseCase(
-                    FakeCityRepository(),
-                    weatherRepository
-                ),
+            SearchCityWeathersUseCase(
+                FakeCityRepository(),
+                weatherRepository
+            ),
             observeFavoriteCityIds =
-                observeIds,
+            observeIds,
             toggleFavoriteCity =
-                toggle,
+            toggle,
             uiMapper =
-                testUiMapper()
+            testUiMapper()
         )
     }
 
     private val detailViewModel by lazy {
         ForecastDetailViewModel(
             savedStateHandle =
-                SavedStateHandle(
-                    mapOf(
-                        ForecastDestination.ARG_CITY_ID to
-                            ankara.id,
-                        ForecastDestination.ARG_NAME to
-                            ankara.name,
-                        ForecastDestination.ARG_REGION to
-                            ankara.region,
-                        ForecastDestination.ARG_COUNTRY to
-                            ankara.country,
-                        ForecastDestination.ARG_LATITUDE to
-                            ankara.coordinates.latitude,
-                        ForecastDestination.ARG_LONGITUDE to
-                            ankara.coordinates.longitude
-                    )
-                ),
+            SavedStateHandle(
+                mapOf(
+                    ForecastDestination.ARG_CITY_ID to
+                        ankara.id,
+                    ForecastDestination.ARG_NAME to
+                        ankara.name,
+                    ForecastDestination.ARG_REGION to
+                        ankara.region,
+                    ForecastDestination.ARG_COUNTRY to
+                        ankara.country,
+                    ForecastDestination.ARG_LATITUDE to
+                        ankara.coordinates.latitude,
+                    ForecastDestination.ARG_LONGITUDE to
+                        ankara.coordinates.longitude
+                )
+            ),
             getForecast =
-                GetForecastUseCase(
-                    weatherRepository
-                ),
+            GetForecastUseCase(
+                weatherRepository
+            ),
             observeFavoriteCityIds =
-                observeIds,
+            observeIds,
             toggleFavoriteCity =
-                toggle,
+            toggle,
             uiMapper =
-                testUiMapper()
+            testUiMapper()
         )
     }
 
@@ -136,109 +136,106 @@ class FavoritesSyncTest {
     }
 
     @Test
-    fun `adding from list is reflected on detail and favorites screens`() =
-        runTest {
-            subscribeAll()
+    fun `adding from list is reflected on detail and favorites screens`() = runTest {
+        subscribeAll()
 
-            listViewModel.onToggleFavorite(
+        listViewModel.onToggleFavorite(
+            ankara.id
+        )
+
+        runCurrent()
+
+        assertTrue(
+            listIsFavorite()
+        )
+
+        assertTrue(
+            detailIsFavorite()
+        )
+
+        assertEquals(
+            listOf(
                 ankara.id
-            )
-
-            runCurrent()
-
-            assertTrue(
-                listIsFavorite()
-            )
-
-            assertTrue(
-                detailIsFavorite()
-            )
-
-            assertEquals(
-                listOf(
-                    ankara.id
-                ),
-                (
-                    favoritesViewModel
-                        .uiState
-                        .value as UiState.Success
-                    )
-                    .data
-                    .map { it.id }
-            )
-        }
-
-    @Test
-    fun `removing from detail is reflected on list and favorites screens`() =
-        runTest {
-            subscribeAll()
-
-            listViewModel.onToggleFavorite(
-                ankara.id
-            )
-
-            runCurrent()
-
-            detailViewModel
-                .onToggleFavorite()
-
-            runCurrent()
-
-            assertFalse(
-                listIsFavorite()
-            )
-
-            assertFalse(
-                detailIsFavorite()
-            )
-
-            assertEquals(
-                UiState.Empty,
+            ),
+            (
                 favoritesViewModel
                     .uiState
-                    .value
-            )
-        }
+                    .value as UiState.Success
+                )
+                .data
+                .map { it.id }
+        )
+    }
 
     @Test
-    fun `undo restores a favorite removed from favorites screen`() =
-        runTest {
-            subscribeAll()
+    fun `removing from detail is reflected on list and favorites screens`() = runTest {
+        subscribeAll()
 
-            detailViewModel
-                .onToggleFavorite()
+        listViewModel.onToggleFavorite(
+            ankara.id
+        )
 
-            runCurrent()
+        runCurrent()
 
+        detailViewModel
+            .onToggleFavorite()
+
+        runCurrent()
+
+        assertFalse(
+            listIsFavorite()
+        )
+
+        assertFalse(
+            detailIsFavorite()
+        )
+
+        assertEquals(
+            UiState.Empty,
             favoritesViewModel
-                .onRemoveFavorite(
-                    ankara.id
-                )
+                .uiState
+                .value
+        )
+    }
 
-            runCurrent()
+    @Test
+    fun `undo restores a favorite removed from favorites screen`() = runTest {
+        subscribeAll()
 
-            assertEquals(
-                FavoritesEvent.ShowUndo(
-                    cityName = ankara.name
-                ),
-                favoritesViewModel
-                    .events
-                    .first()
+        detailViewModel
+            .onToggleFavorite()
+
+        runCurrent()
+
+        favoritesViewModel
+            .onRemoveFavorite(
+                ankara.id
             )
 
-            assertFalse(
-                listIsFavorite()
-            )
+        runCurrent()
 
+        assertEquals(
+            FavoritesEvent.ShowUndo(
+                cityName = ankara.name
+            ),
             favoritesViewModel
-                .onUndoRemove()
+                .events
+                .first()
+        )
 
-            runCurrent()
+        assertFalse(
+            listIsFavorite()
+        )
 
-            assertTrue(
-                listIsFavorite()
-            )
-        }
+        favoritesViewModel
+            .onUndoRemove()
+
+        runCurrent()
+
+        assertTrue(
+            listIsFavorite()
+        )
+    }
 
     private fun TestScope.subscribeAll() {
         backgroundScope.launch {
@@ -262,23 +259,21 @@ class FavoritesSyncTest {
         runCurrent()
     }
 
-    private fun listIsFavorite() =
-        (
-            listViewModel
-                .uiState
-                .value
-                .content as UiState.Success
-            )
-            .data
-            .single()
-            .isFavorite
+    private fun listIsFavorite() = (
+        listViewModel
+            .uiState
+            .value
+            .content as UiState.Success
+        )
+        .data
+        .single()
+        .isFavorite
 
-    private fun detailIsFavorite() =
-        (
-            detailViewModel
-                .uiState
-                .value as UiState.Success
-            )
-            .data
-            .isFavorite
+    private fun detailIsFavorite() = (
+        detailViewModel
+            .uiState
+            .value as UiState.Success
+        )
+        .data
+        .isFavorite
 }

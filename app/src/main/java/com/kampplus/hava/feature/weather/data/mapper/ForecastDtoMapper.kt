@@ -13,114 +13,105 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlinx.serialization.SerializationException
 
-fun ForecastResponseDto.requireCurrent():
-    CurrentDto =
-    current
-        ?: throw SerializationException(
-            "Forecast response has no current block"
-        )
-
-fun ForecastResponseDto.toForecast():
-    Forecast =
-    Forecast(
-        current =
-            requireCurrent()
-                .toDomain(),
-        hourly =
-            hourly
-                ?.toDomain()
-                .orEmpty(),
-        daily =
-            daily
-                ?.toDomain()
-                .orEmpty()
+fun ForecastResponseDto.requireCurrent(): CurrentDto = current
+    ?: throw SerializationException(
+        "Forecast response has no current block"
     )
 
-fun CurrentDto.toDomain() =
-    CurrentWeather(
-        temperatureC =
-            temperature,
-        weatherCode =
-            WeatherCode(
-                weatherCode
-            ),
-        observedAt =
+fun ForecastResponseDto.toForecast(): Forecast = Forecast(
+    current =
+    requireCurrent()
+        .toDomain(),
+    hourly =
+    hourly
+        ?.toDomain()
+        .orEmpty(),
+    daily =
+    daily
+        ?.toDomain()
+        .orEmpty()
+)
+
+fun CurrentDto.toDomain() = CurrentWeather(
+    temperatureC =
+    temperature,
+    weatherCode =
+    WeatherCode(
+        weatherCode
+    ),
+    observedAt =
+    LocalDateTime.parse(
+        time
+    ),
+    apparentTemperatureC =
+    apparentTemperature,
+    humidityPercent =
+    relativeHumidity,
+    windSpeedKmh =
+    windSpeed,
+    isDay =
+    isDay != 0
+)
+
+fun HourlyDto.toDomain(): List<HourlyForecast> = time.indices
+    .mapNotNull { index ->
+
+        val temperature =
+            temperature
+                .getOrNull(index)
+                ?: return@mapNotNull null
+
+        val code =
+            weatherCode
+                .getOrNull(index)
+                ?: return@mapNotNull null
+
+        HourlyForecast(
+            time =
             LocalDateTime.parse(
-                time
+                time[index]
             ),
-        apparentTemperatureC =
-            apparentTemperature,
-        humidityPercent =
-            relativeHumidity,
-        windSpeedKmh =
-            windSpeed,
-        isDay =
-            isDay != 0
-    )
+            temperatureC =
+            temperature,
+            weatherCode =
+            WeatherCode(code),
+            precipitationProbability =
+            precipitationProbability
+                .getOrNull(index)
+        )
+    }
 
-fun HourlyDto.toDomain():
-    List<HourlyForecast> =
-    time.indices
-        .mapNotNull { index ->
+fun DailyDto.toDomain(): List<DailyForecast> = time.indices
+    .mapNotNull { index ->
 
-            val temperature =
-                temperature
-                    .getOrNull(index)
-                    ?: return@mapNotNull null
+        val max =
+            temperatureMax
+                .getOrNull(index)
+                ?: return@mapNotNull null
 
-            val code =
-                weatherCode
-                    .getOrNull(index)
-                    ?: return@mapNotNull null
+        val min =
+            temperatureMin
+                .getOrNull(index)
+                ?: return@mapNotNull null
 
-            HourlyForecast(
-                time =
-                    LocalDateTime.parse(
-                        time[index]
-                    ),
-                temperatureC =
-                    temperature,
-                weatherCode =
-                    WeatherCode(code),
-                precipitationProbability =
-                    precipitationProbability
-                        .getOrNull(index)
-            )
-        }
+        val code =
+            weatherCode
+                .getOrNull(index)
+                ?: return@mapNotNull null
 
-fun DailyDto.toDomain():
-    List<DailyForecast> =
-    time.indices
-        .mapNotNull { index ->
-
-            val max =
-                temperatureMax
-                    .getOrNull(index)
-                    ?: return@mapNotNull null
-
-            val min =
-                temperatureMin
-                    .getOrNull(index)
-                    ?: return@mapNotNull null
-
-            val code =
-                weatherCode
-                    .getOrNull(index)
-                    ?: return@mapNotNull null
-
-            DailyForecast(
-                date =
-                    LocalDate.parse(
-                        time[index]
-                    ),
-                minTemperatureC =
-                    min,
-                maxTemperatureC =
-                    max,
-                weatherCode =
-                    WeatherCode(code),
-                precipitationProbability =
-                    precipitationProbabilityMax
-                        .getOrNull(index)
-            )
-        }
+        DailyForecast(
+            date =
+            LocalDate.parse(
+                time[index]
+            ),
+            minTemperatureC =
+            min,
+            maxTemperatureC =
+            max,
+            weatherCode =
+            WeatherCode(code),
+            precipitationProbability =
+            precipitationProbabilityMax
+                .getOrNull(index)
+        )
+    }

@@ -14,84 +14,81 @@ import androidx.compose.ui.unit.dp
 import com.kampplus.hava.feature.weather.presentation.model.DailyUiModel
 
 @Composable
-fun DailyForecastItem(
-    day: DailyUiModel,
-    modifier: Modifier = Modifier
-) {
+fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 10.dp
-                ),
+        modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 10.dp
+            ),
         verticalAlignment =
-            Alignment.CenterVertically
+        Alignment.CenterVertically
     ) {
         Text(
             text =
-                day.dayLabel.asString(),
+            day.dayLabel.asString(),
             style =
-                MaterialTheme.typography
-                    .bodyLarge,
+            MaterialTheme.typography
+                .bodyLarge,
             modifier =
-                Modifier.weight(1f)
+            Modifier.weight(1f)
         )
 
         Text(
             text =
-                day.precipitationText
-                    .orEmpty(),
+            day.precipitationText
+                .orEmpty(),
             style =
-                MaterialTheme.typography
-                    .labelMedium,
+            MaterialTheme.typography
+                .labelMedium,
             color =
-                MaterialTheme.colorScheme
-                    .primary,
+            MaterialTheme.colorScheme
+                .primary,
             modifier =
-                Modifier.width(44.dp),
+            Modifier.width(44.dp),
             textAlign =
-                TextAlign.End
+            TextAlign.End
         )
 
         Text(
             text =
-                day.emoji,
+            day.emoji,
             style =
-                MaterialTheme.typography
-                    .titleLarge,
+            MaterialTheme.typography
+                .titleLarge,
             modifier =
-                Modifier.padding(
-                    horizontal = 12.dp
-                )
+            Modifier.padding(
+                horizontal = 12.dp
+            )
         )
 
         Text(
             text =
-                day.minText,
+            day.minText,
             style =
-                MaterialTheme.typography
-                    .bodyLarge,
+            MaterialTheme.typography
+                .bodyLarge,
             color =
-                MaterialTheme.colorScheme
-                    .onSurfaceVariant,
+            MaterialTheme.colorScheme
+                .onSurfaceVariant,
             modifier =
-                Modifier.width(40.dp),
+            Modifier.width(40.dp),
             textAlign =
-                TextAlign.End
+            TextAlign.End
         )
 
         Text(
             text =
-                day.maxText,
+            day.maxText,
             style =
-                MaterialTheme.typography
-                    .titleMedium,
+            MaterialTheme.typography
+                .titleMedium,
             modifier =
-                Modifier.width(44.dp),
+            Modifier.width(44.dp),
             textAlign =
-                TextAlign.End
+            TextAlign.End
         )
     }
 }

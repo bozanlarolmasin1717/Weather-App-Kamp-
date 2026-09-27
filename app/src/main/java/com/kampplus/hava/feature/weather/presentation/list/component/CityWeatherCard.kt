@@ -22,89 +22,83 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
 
 @Composable
-fun CityWeatherCard(
-    item: CityWeatherUiModel,
-    onClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun CityWeatherCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavoriteClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         onClick = onClick,
         modifier =
-            modifier.fillMaxWidth()
+        modifier.fillMaxWidth()
     ) {
         Row(
             modifier =
-                Modifier.padding(
-                    12.dp
-                ),
+            Modifier.padding(
+                12.dp
+            ),
             verticalAlignment =
-                Alignment.CenterVertically,
+            Alignment.CenterVertically,
             horizontalArrangement =
-                Arrangement.spacedBy(
-                    12.dp
-                )
+            Arrangement.spacedBy(
+                12.dp
+            )
         ) {
-
             TemperatureBadge(
                 text =
-                    item.temperatureText,
+                item.temperatureText,
                 containerColor =
-                    temperatureColor(
-                        item.temperatureC
-                    )
+                temperatureColor(
+                    item.temperatureC
+                )
             )
 
             Column(
                 modifier =
-                    Modifier.weight(1f)
+                Modifier.weight(1f)
             ) {
                 Text(
                     text =
-                        item.title,
+                    item.title,
                     style =
-                        MaterialTheme
-                            .typography
-                            .titleMedium,
+                    MaterialTheme
+                        .typography
+                        .titleMedium,
                     maxLines = 1,
                     overflow =
-                        TextOverflow.Ellipsis
+                    TextOverflow.Ellipsis
                 )
 
                 Text(
                     text =
-                        item.subtitle,
+                    item.subtitle,
                     style =
-                        MaterialTheme
-                            .typography
-                            .bodyMedium,
+                    MaterialTheme
+                        .typography
+                        .bodyMedium,
                     color =
-                        MaterialTheme
-                            .colorScheme
-                            .onSurfaceVariant,
+                    MaterialTheme
+                        .colorScheme
+                        .onSurfaceVariant,
                     maxLines = 1,
                     overflow =
-                        TextOverflow.Ellipsis
+                    TextOverflow.Ellipsis
                 )
 
                 Text(
                     text =
-                        "${item.conditionEmoji} " +
-                            item
-                                .conditionLabel
-                                .asString(),
+                    "${item.conditionEmoji} " +
+                        item
+                            .conditionLabel
+                            .asString(),
                     style =
-                        MaterialTheme
-                            .typography
-                            .bodyMedium
+                    MaterialTheme
+                        .typography
+                        .bodyMedium
                 )
             }
 
             FavoriteToggleButton(
                 isFavorite =
-                    item.isFavorite,
+                item.isFavorite,
                 onClick =
-                    onFavoriteClick
+                onFavoriteClick
             )
         }
     }
@@ -116,22 +110,22 @@ private fun CityWeatherCardPreview() {
     HavaTheme {
         CityWeatherCard(
             item =
-                CityWeatherUiModel(
-                    cityId = 1,
-                    title = "Ankara",
-                    subtitle =
-                        "Ankara, Türkiye",
-                    temperatureText =
-                        "21°",
-                    temperatureC =
-                        21.0,
-                    conditionEmoji =
-                        "☀️",
-                    conditionLabel =
-                        UiText.Dynamic(
-                            "Açık"
-                        )
-                ),
+            CityWeatherUiModel(
+                cityId = 1,
+                title = "Ankara",
+                subtitle =
+                "Ankara, Türkiye",
+                temperatureText =
+                "21°",
+                temperatureC =
+                21.0,
+                conditionEmoji =
+                "☀️",
+                conditionLabel =
+                UiText.Dynamic(
+                    "Açık"
+                )
+            ),
             onClick = {},
             onFavoriteClick = {}
         )

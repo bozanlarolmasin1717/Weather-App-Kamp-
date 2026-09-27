@@ -1,6 +1,8 @@
 package com.kampplus.hava.feature.weather.domain.policy
 
 import com.kampplus.hava.feature.weather.domain.model.WeatherCode
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class WmoWeatherConditionClassifierTest {
 
@@ -9,7 +11,6 @@ class WmoWeatherConditionClassifierTest {
 
     @Test
     fun `maps wmo code groups to conditions`() {
-
         mapOf(
             0 to WeatherCondition.Clear,
             2 to WeatherCondition.PartlyCloudy,
@@ -22,7 +23,8 @@ class WmoWeatherConditionClassifierTest {
             99 to WeatherCondition.Thunderstorm
         ).forEach {
                 code,
-                expected ->
+                expected
+            ->
 
             assertEquals(
                 "code $code",
@@ -36,7 +38,6 @@ class WmoWeatherConditionClassifierTest {
 
     @Test
     fun `unknown code does not crash`() {
-
         assertEquals(
             WeatherCondition.Unknown,
             classifier.classify(

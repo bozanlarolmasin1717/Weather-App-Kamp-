@@ -9,8 +9,5 @@ import javax.inject.Inject
 class GetForecastUseCase @Inject constructor(
     private val repository: WeatherRepository
 ) {
-    suspend operator fun invoke(
-        city: City
-    ): AppResult<Forecast> =
-        repository.getForecast(city)
+    suspend operator fun invoke(city: City): AppResult<Forecast> = repository.getForecast(city)
 }

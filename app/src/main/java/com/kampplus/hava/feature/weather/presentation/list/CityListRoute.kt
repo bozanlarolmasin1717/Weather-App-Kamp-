@@ -9,22 +9,20 @@ import com.kampplus.hava.feature.weather.domain.model.City
 
 @Composable
 fun CityListRoute(
-    onCityClick:
-        (City) -> Unit,
+    onCityClick: (City) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel:
-    CityListViewModel =
+    viewModel: CityListViewModel =
         hiltViewModel()
 ) {
     val uiState by
-    viewModel
-        .uiState
-        .collectAsStateWithLifecycle()
+        viewModel
+            .uiState
+            .collectAsStateWithLifecycle()
 
     CityListScreen(
         uiState = uiState,
         onQueryChange =
-            viewModel::onQueryChange,
+        viewModel::onQueryChange,
         onCityClick = { cityId ->
 
             viewModel
@@ -34,11 +32,11 @@ fun CityListRoute(
                 )
         },
         onFavoriteClick =
-            viewModel::onToggleFavorite,
+        viewModel::onToggleFavorite,
         onRetry =
-            viewModel::onRetry,
+        viewModel::onRetry,
         onRefresh =
-            viewModel::onRefresh,
+        viewModel::onRefresh,
         modifier = modifier
     )
 }

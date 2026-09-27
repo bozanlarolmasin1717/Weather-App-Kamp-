@@ -22,16 +22,12 @@ object DatabaseModule {
     fun provideDatabase(
         @ApplicationContext
         context: Context
-    ): HavaDatabase =
-        Room.databaseBuilder(
-            context,
-            HavaDatabase::class.java,
-            HavaDatabase.NAME
-        ).build()
+    ): HavaDatabase = Room.databaseBuilder(
+        context,
+        HavaDatabase::class.java,
+        HavaDatabase.NAME
+    ).build()
 
     @Provides
-    fun provideFavoriteCityDao(
-        database: HavaDatabase
-    ): FavoriteCityDao =
-        database.favoriteCityDao()
+    fun provideFavoriteCityDao(database: HavaDatabase): FavoriteCityDao = database.favoriteCityDao()
 }

@@ -10,51 +10,45 @@ import com.kampplus.hava.feature.weather.domain.model.Forecast
 import javax.inject.Inject
 
 class OpenMeteoWeatherRemoteDataSource @Inject constructor(
-    private val api:
-    OpenMeteoForecastApi
+    private val api: OpenMeteoForecastApi
 ) : WeatherRemoteDataSource {
 
-    override suspend fun getCurrentWeather(
-        cities: List<City>
-    ): List<CityWeather> {
-
+    override suspend fun getCurrentWeather(cities: List<City>): List<CityWeather> {
         if (cities.isEmpty()) {
             return emptyList()
         }
 
         val responses =
             if (cities.size == 1) {
-
                 val city =
                     cities.single()
 
                 listOf(
                     api.getForecast(
                         latitude =
-                            city.latitude(),
+                        city.latitude(),
                         longitude =
-                            city.longitude(),
+                        city.longitude(),
                         current =
-                            CURRENT_FIELDS
+                        CURRENT_FIELDS
                     )
                 )
             } else {
-
                 api.getForecasts(
                     latitudes =
-                        cities.joinToString(
-                            ","
-                        ) {
-                            it.latitude()
-                        },
+                    cities.joinToString(
+                        ","
+                    ) {
+                        it.latitude()
+                    },
                     longitudes =
-                        cities.joinToString(
-                            ","
-                        ) {
-                            it.longitude()
-                        },
+                    cities.joinToString(
+                        ","
+                    ) {
+                        it.longitude()
+                    },
                     current =
-                        CURRENT_FIELDS
+                    CURRENT_FIELDS
                 )
             }
 
@@ -62,44 +56,40 @@ class OpenMeteoWeatherRemoteDataSource @Inject constructor(
             responses
         ) {
                 city,
-                response ->
+                response
+            ->
 
             CityWeather(
                 city = city,
                 current =
-                    response
-                        .requireCurrent()
-                        .toDomain()
+                response
+                    .requireCurrent()
+                    .toDomain()
             )
         }
     }
 
-    override suspend fun getForecast(
-        city: City
-    ): Forecast =
-        api.getForecast(
-            latitude =
-                city.latitude(),
-            longitude =
-                city.longitude(),
-            current =
-                CURRENT_FIELDS,
-            hourly =
-                HOURLY_FIELDS,
-            daily =
-                DAILY_FIELDS,
-            forecastDays =
-                FORECAST_DAYS
-        )
-            .toForecast()
+    override suspend fun getForecast(city: City): Forecast = api.getForecast(
+        latitude =
+        city.latitude(),
+        longitude =
+        city.longitude(),
+        current =
+        CURRENT_FIELDS,
+        hourly =
+        HOURLY_FIELDS,
+        daily =
+        DAILY_FIELDS,
+        forecastDays =
+        FORECAST_DAYS
+    )
+        .toForecast()
 
-    private fun City.latitude() =
-        coordinates.latitude
-            .toString()
+    private fun City.latitude() = coordinates.latitude
+        .toString()
 
-    private fun City.longitude() =
-        coordinates.longitude
-            .toString()
+    private fun City.longitude() = coordinates.longitude
+        .toString()
 
     private companion object {
 

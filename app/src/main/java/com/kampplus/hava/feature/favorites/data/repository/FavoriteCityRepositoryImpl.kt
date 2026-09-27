@@ -7,32 +7,20 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class FavoriteCityRepositoryImpl @Inject constructor(
-    private val localDataSource:
-    FavoriteCityLocalDataSource
+    private val localDataSource: FavoriteCityLocalDataSource
 ) : FavoriteCityRepository {
 
-    override fun observeFavorites():
-        Flow<List<FavoriteCity>> =
-        localDataSource.observeAll()
+    override fun observeFavorites(): Flow<List<FavoriteCity>> = localDataSource.observeAll()
 
-    override suspend fun isFavorite(
-        id: Long
-    ): Boolean =
-        localDataSource.contains(
-            id
-        )
+    override suspend fun isFavorite(id: Long): Boolean = localDataSource.contains(
+        id
+    )
 
-    override suspend fun add(
-        city: FavoriteCity
-    ) =
-        localDataSource.upsert(
-            city
-        )
+    override suspend fun add(city: FavoriteCity) = localDataSource.upsert(
+        city
+    )
 
-    override suspend fun remove(
-        id: Long
-    ) =
-        localDataSource.delete(
-            id
-        )
+    override suspend fun remove(id: Long) = localDataSource.delete(
+        id
+    )
 }

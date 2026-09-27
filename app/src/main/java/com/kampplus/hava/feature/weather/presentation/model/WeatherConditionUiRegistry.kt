@@ -27,6 +27,5 @@ class WeatherConditionUiRegistry @Inject constructor(
         @JvmSuppressWildcards WeatherConditionUi
         >
 ) {
-    fun resolve(condition: WeatherCondition): WeatherConditionUi =
-        entries[condition] ?: WeatherConditionUi.Unknown
+    fun resolve(condition: WeatherCondition): WeatherConditionUi = entries[condition] ?: WeatherConditionUi.Unknown
 }

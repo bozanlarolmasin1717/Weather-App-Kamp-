@@ -6,11 +6,7 @@ import com.kampplus.hava.feature.weather.domain.model.Forecast
 
 interface WeatherRemoteDataSource {
 
-    suspend fun getCurrentWeather(
-        cities: List<City>
-    ): List<CityWeather>
+    suspend fun getCurrentWeather(cities: List<City>): List<CityWeather>
 
-    suspend fun getForecast(
-        city: City
-    ): Forecast
+    suspend fun getForecast(city: City): Forecast
 }

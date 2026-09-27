@@ -37,18 +37,12 @@ import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
 )
 @Composable
 fun CityListScreen(
-    uiState:
-    CityListUiState,
-    onQueryChange:
-        (String) -> Unit,
-    onCityClick:
-        (Long) -> Unit,
-    onFavoriteClick:
-        (Long) -> Unit,
-    onRetry:
-        () -> Unit,
-    onRefresh:
-        () -> Unit,
+    uiState: CityListUiState,
+    onQueryChange: (String) -> Unit,
+    onCityClick: (Long) -> Unit,
+    onFavoriteClick: (Long) -> Unit,
+    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -68,46 +62,45 @@ fun CityListScreen(
 
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(
-                        innerPadding
-                    )
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    innerPadding
+                )
         ) {
-
             CitySearchField(
                 query =
-                    uiState.query,
+                uiState.query,
                 onQueryChange =
-                    onQueryChange,
+                onQueryChange,
                 modifier =
-                    Modifier.padding(
-                        horizontal =
-                            16.dp,
-                        vertical =
-                            8.dp
-                    )
+                Modifier.padding(
+                    horizontal =
+                    16.dp,
+                    vertical =
+                    8.dp
+                )
             )
 
             PullToRefreshBox(
                 isRefreshing =
-                    uiState
-                        .isRefreshing,
+                uiState
+                    .isRefreshing,
                 onRefresh =
-                    onRefresh,
+                onRefresh,
                 modifier =
-                    Modifier
-                        .fillMaxSize()
+                Modifier
+                    .fillMaxSize()
             ) {
                 ListContent(
                     uiState =
-                        uiState,
+                    uiState,
                     onCityClick =
-                        onCityClick,
+                    onCityClick,
                     onFavoriteClick =
-                        onFavoriteClick,
+                    onFavoriteClick,
                     onRetry =
-                        onRetry
+                    onRetry
                 )
             }
         }
@@ -116,77 +109,72 @@ fun CityListScreen(
 
 @Composable
 private fun ListContent(
-    uiState:
-    CityListUiState,
-    onCityClick:
-        (Long) -> Unit,
-    onFavoriteClick:
-        (Long) -> Unit,
-    onRetry:
-        () -> Unit,
+    uiState: CityListUiState,
+    onCityClick: (Long) -> Unit,
+    onFavoriteClick: (Long) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier =
-            modifier.fillMaxSize(),
+        modifier.fillMaxSize(),
         contentAlignment =
-            Alignment.Center
+        Alignment.Center
     ) {
         when (
             val content =
                 uiState.content
         ) {
-
             UiState.Loading ->
                 ShimmerList()
 
             UiState.Empty ->
                 EmptyView(
                     icon =
-                        Icons.Filled.Search,
+                    Icons.Filled.Search,
                     title =
+                    stringResource(
+                        R.string
+                            .list_empty_title
+                    ),
+                    message =
+                    if (
+                        uiState
+                            .isSearching
+                    ) {
                         stringResource(
                             R.string
-                                .list_empty_title
-                        ),
-                    message =
-                        if (
+                                .search_empty_message,
                             uiState
-                                .isSearching
-                        ) {
-                            stringResource(
-                                R.string
-                                    .search_empty_message,
-                                uiState
-                                    .query
-                                    .trim()
-                            )
-                        } else {
-                            stringResource(
-                                R.string
-                                    .list_empty_message
-                            )
-                        }
+                                .query
+                                .trim()
+                        )
+                    } else {
+                        stringResource(
+                            R.string
+                                .list_empty_message
+                        )
+                    }
                 )
 
             is UiState.Error ->
                 ErrorView(
                     message =
-                        content
-                            .message
-                            .asString(),
+                    content
+                        .message
+                        .asString(),
                     onRetry =
-                        onRetry
+                    onRetry
                 )
 
             is UiState.Success ->
                 CityList(
                     items =
-                        content.data,
+                    content.data,
                     onCityClick =
-                        onCityClick,
+                    onCityClick,
                     onFavoriteClick =
-                        onFavoriteClick
+                    onFavoriteClick
                 )
         }
     }
@@ -194,23 +182,20 @@ private fun ListContent(
 
 @Composable
 private fun CityList(
-    items:
-    List<CityWeatherUiModel>,
-    onCityClick:
-        (Long) -> Unit,
-    onFavoriteClick:
-        (Long) -> Unit,
+    items: List<CityWeatherUiModel>,
+    onCityClick: (Long) -> Unit,
+    onFavoriteClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier =
-            modifier.fillMaxSize(),
+        modifier.fillMaxSize(),
         contentPadding =
-            PaddingValues(16.dp),
+        PaddingValues(16.dp),
         verticalArrangement =
-            Arrangement.spacedBy(
-                12.dp
-            )
+        Arrangement.spacedBy(
+            12.dp
+        )
     ) {
         items(
             items = items,
@@ -242,32 +227,32 @@ private fun CityListScreenPreview() {
     HavaTheme {
         CityListScreen(
             uiState =
-                CityListUiState(
-                    content =
-                        UiState.Success(
-                            List(5) { index ->
+            CityListUiState(
+                content =
+                UiState.Success(
+                    List(5) { index ->
 
-                                CityWeatherUiModel(
-                                    cityId =
-                                        index.toLong(),
-                                    title =
-                                        "İstanbul",
-                                    subtitle =
-                                        "İstanbul, Türkiye",
-                                    temperatureText =
-                                        "2$index°",
-                                    temperatureC =
-                                        20.0 + index,
-                                    conditionEmoji =
-                                        "⛅",
-                                    conditionLabel =
-                                        UiText.Dynamic(
-                                            "Parçalı bulutlu"
-                                        )
-                                )
-                            }
+                        CityWeatherUiModel(
+                            cityId =
+                            index.toLong(),
+                            title =
+                            "İstanbul",
+                            subtitle =
+                            "İstanbul, Türkiye",
+                            temperatureText =
+                            "2$index°",
+                            temperatureC =
+                            20.0 + index,
+                            conditionEmoji =
+                            "⛅",
+                            conditionLabel =
+                            UiText.Dynamic(
+                                "Parçalı bulutlu"
+                            )
                         )
-                ),
+                    }
+                )
+            ),
             onQueryChange = {},
             onCityClick = {},
             onFavoriteClick = {},

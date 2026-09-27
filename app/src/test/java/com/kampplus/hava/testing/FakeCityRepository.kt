@@ -5,8 +5,7 @@ import com.kampplus.hava.feature.weather.domain.model.City
 import com.kampplus.hava.feature.weather.domain.repository.CityRepository
 
 class FakeCityRepository(
-    var searchResult:
-        (String) ->
+    var searchResult: (String) ->
     AppResult<
         List<City>
         > = {
@@ -19,10 +18,7 @@ class FakeCityRepository(
     val queries =
         mutableListOf<String>()
 
-    override suspend fun search(
-        query: String
-    ): AppResult<List<City>> {
-
+    override suspend fun search(query: String): AppResult<List<City>> {
         queries +=
             query
 

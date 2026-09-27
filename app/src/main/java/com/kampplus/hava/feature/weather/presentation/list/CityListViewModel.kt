@@ -38,16 +38,11 @@ import kotlinx.coroutines.launch
 )
 @HiltViewModel
 class CityListViewModel @Inject constructor(
-    private val getCityWeathers:
-    GetCityWeathersUseCase,
-    private val searchCityWeathers:
-    SearchCityWeathersUseCase,
-    observeFavoriteCityIds:
-    ObserveFavoriteCityIdsUseCase,
-    private val toggleFavoriteCity:
-    ToggleFavoriteCityUseCase,
-    private val uiMapper:
-    WeatherUiMapper
+    private val getCityWeathers: GetCityWeathersUseCase,
+    private val searchCityWeathers: SearchCityWeathersUseCase,
+    observeFavoriteCityIds: ObserveFavoriteCityIdsUseCase,
+    private val toggleFavoriteCity: ToggleFavoriteCityUseCase,
+    private val uiMapper: WeatherUiMapper
 ) : ViewModel() {
 
     private var loadedCities:
@@ -92,12 +87,12 @@ class CityListViewModel @Inject constructor(
             reloadTrigger
         ) {
                 searchText,
-                _ ->
+                _
+            ->
 
             searchText
         }
-            .flatMapLatest {
-                    searchText ->
+            .flatMapLatest { searchText ->
 
                 val source =
                     if (
@@ -161,67 +156,63 @@ class CityListViewModel @Inject constructor(
                 query,
                 result,
                 favoriteIds,
-                refreshing ->
+                refreshing
+            ->
 
             CityListUiState(
                 query = query,
                 content =
-                    when (result) {
+                when (result) {
 
-                        null ->
-                            UiState.Loading
+                    null ->
+                        UiState.Loading
 
-                        is AppResult.Success ->
-                            if (
-                                result.data
-                                    .isEmpty()
-                            ) {
-                                UiState.Empty
-                            } else {
-                                UiState.Success(
-                                    result.data.map {
-                                        uiMapper
-                                            .toListItem(
-                                                it,
-                                                isFavorite =
-                                                    it.city.id in
-                                                        favoriteIds
-                                            )
-                                    }
-                                )
-                            }
-
-                        is AppResult.Failure ->
-                            UiState.Error(
-                                result
-                                    .error
-                                    .toUiText()
+                    is AppResult.Success ->
+                        if (
+                            result.data
+                                .isEmpty()
+                        ) {
+                            UiState.Empty
+                        } else {
+                            UiState.Success(
+                                result.data.map {
+                                    uiMapper
+                                        .toListItem(
+                                            it,
+                                            isFavorite =
+                                            it.city.id in
+                                                favoriteIds
+                                        )
+                                }
                             )
-                    },
+                        }
+
+                    is AppResult.Failure ->
+                        UiState.Error(
+                            result
+                                .error
+                                .toUiText()
+                        )
+                },
                 isRefreshing =
-                    refreshing
+                refreshing
             )
         }
             .stateIn(
                 scope =
-                    viewModelScope,
+                viewModelScope,
                 started =
-                    SharingStarted
-                        .WhileSubscribed(
-                            STOP_TIMEOUT_MS
-                        ),
+                SharingStarted
+                    .WhileSubscribed(
+                        STOP_TIMEOUT_MS
+                    ),
                 initialValue =
-                    CityListUiState()
+                CityListUiState()
             )
 
-    fun findCity(
-        cityId: Long
-    ): City? =
-        loadedCities[cityId]
+    fun findCity(cityId: Long): City? = loadedCities[cityId]
 
-    fun onQueryChange(
-        text: String
-    ) {
+    fun onQueryChange(text: String) {
         query.value =
             text
     }
@@ -241,9 +232,7 @@ class CityListViewModel @Inject constructor(
         }
     }
 
-    fun onToggleFavorite(
-        cityId: Long
-    ) {
+    fun onToggleFavorite(cityId: Long) {
         val city =
             loadedCities[cityId]
                 ?: return

@@ -20,10 +20,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    observeFavoriteCities:
-    ObserveFavoriteCitiesUseCase,
-    private val toggleFavoriteCity:
-    ToggleFavoriteCityUseCase
+    observeFavoriteCities: ObserveFavoriteCitiesUseCase,
+    private val toggleFavoriteCity: ToggleFavoriteCityUseCase
 ) : ViewModel() {
 
     private var favoritesById:
@@ -73,30 +71,24 @@ class FavoritesViewModel @Inject constructor(
             }
             .stateIn(
                 scope =
-                    viewModelScope,
+                viewModelScope,
                 started =
-                    SharingStarted
-                        .WhileSubscribed(
-                            STOP_TIMEOUT_MS
-                        ),
+                SharingStarted
+                    .WhileSubscribed(
+                        STOP_TIMEOUT_MS
+                    ),
                 initialValue =
-                    UiState.Loading
+                UiState.Loading
             )
 
-    fun findFavorite(
-        id: Long
-    ): FavoriteCity? =
-        favoritesById[id]
+    fun findFavorite(id: Long): FavoriteCity? = favoritesById[id]
 
-    fun onRemoveFavorite(
-        id: Long
-    ) {
+    fun onRemoveFavorite(id: Long) {
         val favorite =
             favoritesById[id]
                 ?: return
 
         viewModelScope.launch {
-
             toggleFavoriteCity(
                 favorite
             )
@@ -107,14 +99,13 @@ class FavoritesViewModel @Inject constructor(
             _events.send(
                 FavoritesEvent.ShowUndo(
                     cityName =
-                        favorite.name
+                    favorite.name
                 )
             )
         }
     }
 
     fun onUndoRemove() {
-
         val favorite =
             lastRemoved
                 ?: return
@@ -129,18 +120,17 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    private fun FavoriteCity.toUiModel() =
-        FavoriteCityUiModel(
-            id = id,
-            title = name,
-            subtitle =
-                listOfNotNull(
-                    region,
-                    country
-                )
-                    .distinct()
-                    .joinToString(", ")
+    private fun FavoriteCity.toUiModel() = FavoriteCityUiModel(
+        id = id,
+        title = name,
+        subtitle =
+        listOfNotNull(
+            region,
+            country
         )
+            .distinct()
+            .joinToString(", ")
+    )
 
     private companion object {
 

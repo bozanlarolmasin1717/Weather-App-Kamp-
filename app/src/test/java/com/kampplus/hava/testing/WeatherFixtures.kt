@@ -15,52 +15,43 @@ fun city(
     name: String = "Ankara",
     region: String? = "Ankara",
     country: String? = "Türkiye",
-    coordinates:
-    Coordinates =
+    coordinates: Coordinates =
         Coordinates(
             39.92,
             32.85
         )
-) =
-    City(
-        id = id,
-        name = name,
-        region = region,
-        country = country,
-        coordinates =
-            coordinates
-    )
+) = City(
+    id = id,
+    name = name,
+    region = region,
+    country = country,
+    coordinates =
+    coordinates
+)
 
-fun cityWeather(
-    city: City = city(),
-    temperatureC:
-    Double = 21.4,
-    code: Int = 0
-) =
-    CityWeather(
-        city = city,
-        current =
-            CurrentWeather(
-                temperatureC =
-                    temperatureC,
-                weatherCode =
-                    WeatherCode(
-                        code
-                    ),
-                observedAt =
-                    LocalDateTime.of(
-                        2026,
-                        9,
-                        24,
-                        12,
-                        0
-                    )
-            )
+fun cityWeather(city: City = city(), temperatureC: Double = 21.4, code: Int = 0) = CityWeather(
+    city = city,
+    current =
+    CurrentWeather(
+        temperatureC =
+        temperatureC,
+        weatherCode =
+        WeatherCode(
+            code
+        ),
+        observedAt =
+        LocalDateTime.of(
+            2026,
+            9,
+            24,
+            12,
+            0
+        )
     )
+)
 
 fun forecast(
-    observedAt:
-    LocalDateTime =
+    observedAt: LocalDateTime =
         LocalDateTime.of(
             2026,
             9,
@@ -68,61 +59,60 @@ fun forecast(
             12,
             30
         )
-) =
-    Forecast(
-        current =
-            CurrentWeather(
-                temperatureC =
-                    21.4,
-                weatherCode =
-                    WeatherCode(0),
-                observedAt =
-                    observedAt,
-                apparentTemperatureC =
-                    20.2,
-                humidityPercent =
-                    45,
-                windSpeedKmh =
-                    11.6
-            ),
-        hourly =
-            List(48) { hour ->
+) = Forecast(
+    current =
+    CurrentWeather(
+        temperatureC =
+        21.4,
+        weatherCode =
+        WeatherCode(0),
+        observedAt =
+        observedAt,
+        apparentTemperatureC =
+        20.2,
+        humidityPercent =
+        45,
+        windSpeedKmh =
+        11.6
+    ),
+    hourly =
+    List(48) { hour ->
 
-                HourlyForecast(
-                    time =
-                        observedAt
-                            .toLocalDate()
-                            .atStartOfDay()
-                            .plusHours(
-                                hour.toLong()
-                            ),
-                    temperatureC =
-                        15.0 +
-                            hour % 10,
-                    weatherCode =
-                        WeatherCode(1),
-                    precipitationProbability =
-                        0
-                )
-            },
-        daily =
-            List(7) { day ->
+        HourlyForecast(
+            time =
+            observedAt
+                .toLocalDate()
+                .atStartOfDay()
+                .plusHours(
+                    hour.toLong()
+                ),
+            temperatureC =
+            15.0 +
+                hour % 10,
+            weatherCode =
+            WeatherCode(1),
+            precipitationProbability =
+            0
+        )
+    },
+    daily =
+    List(7) { day ->
 
-                DailyForecast(
-                    date =
-                        observedAt
-                            .toLocalDate()
-                            .plusDays(
-                                day.toLong()
-                            ),
-                    minTemperatureC =
-                        12.0,
-                    maxTemperatureC =
-                        24.0,
-                    weatherCode =
-                        WeatherCode(61),
-                    precipitationProbability =
-                        30
-                )
-            }
-    )
+        DailyForecast(
+            date =
+            observedAt
+                .toLocalDate()
+                .plusDays(
+                    day.toLong()
+                ),
+            minTemperatureC =
+            12.0,
+            maxTemperatureC =
+            24.0,
+            weatherCode =
+            WeatherCode(61),
+            precipitationProbability =
+            30
+        )
+    }
+)

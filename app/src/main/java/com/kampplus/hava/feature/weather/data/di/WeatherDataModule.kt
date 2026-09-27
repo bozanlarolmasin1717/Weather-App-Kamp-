@@ -32,41 +32,23 @@ abstract class WeatherDataModule {
 
     @Binds
     @Singleton
-    abstract fun bindWeatherRepository(
-        impl:
-        WeatherRepositoryImpl
-    ): WeatherRepository
+    abstract fun bindWeatherRepository(impl: WeatherRepositoryImpl): WeatherRepository
 
     @Binds
-    abstract fun bindWeatherRemoteDataSource(
-        impl:
-        OpenMeteoWeatherRemoteDataSource
-    ): WeatherRemoteDataSource
+    abstract fun bindWeatherRemoteDataSource(impl: OpenMeteoWeatherRemoteDataSource): WeatherRemoteDataSource
 
     @Binds
     @Singleton
-    abstract fun bindCityRepository(
-        impl:
-        CityRepositoryImpl
-    ): CityRepository
+    abstract fun bindCityRepository(impl: CityRepositoryImpl): CityRepository
 
     @Binds
-    abstract fun bindCityRemoteDataSource(
-        impl:
-        OpenMeteoCityRemoteDataSource
-    ): CityRemoteDataSource
+    abstract fun bindCityRemoteDataSource(impl: OpenMeteoCityRemoteDataSource): CityRemoteDataSource
 
     @Binds
-    abstract fun bindCityCatalog(
-        impl:
-        TurkishCityCatalog
-    ): CityCatalog
+    abstract fun bindCityCatalog(impl: TurkishCityCatalog): CityCatalog
 
     @Binds
-    abstract fun bindWeatherConditionClassifier(
-        impl:
-        WmoWeatherConditionClassifier
-    ): WeatherConditionClassifier
+    abstract fun bindWeatherConditionClassifier(impl: WmoWeatherConditionClassifier): WeatherConditionClassifier
 
     companion object {
 
@@ -75,19 +57,17 @@ abstract class WeatherDataModule {
         fun provideForecastApi(
             @ForecastRetrofit
             retrofit: Retrofit
-        ): OpenMeteoForecastApi =
-            retrofit.create(
-                OpenMeteoForecastApi::class.java
-            )
+        ): OpenMeteoForecastApi = retrofit.create(
+            OpenMeteoForecastApi::class.java
+        )
 
         @Provides
         @Singleton
         fun provideGeocodingApi(
             @GeocodingRetrofit
             retrofit: Retrofit
-        ): OpenMeteoGeocodingApi =
-            retrofit.create(
-                OpenMeteoGeocodingApi::class.java
-            )
+        ): OpenMeteoGeocodingApi = retrofit.create(
+            OpenMeteoGeocodingApi::class.java
+        )
     }
 }

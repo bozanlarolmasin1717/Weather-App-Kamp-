@@ -92,7 +92,7 @@ class ForecastDetailViewModel @Inject constructor(
                             city,
                             result.data,
                             isFavorite =
-                                city.id in favoriteIds
+                            city.id in favoriteIds
                         )
                     )
 
@@ -105,9 +105,9 @@ class ForecastDetailViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started =
-                    SharingStarted.WhileSubscribed(
-                        STOP_TIMEOUT_MS
-                    ),
+                SharingStarted.WhileSubscribed(
+                    STOP_TIMEOUT_MS
+                ),
                 initialValue = UiState.Loading
             )
 
@@ -115,8 +115,7 @@ class ForecastDetailViewModel @Inject constructor(
         load()
     }
 
-    fun onRetry() =
-        load()
+    fun onRetry() = load()
 
     fun onRefresh() {
         viewModelScope.launch {

@@ -18,70 +18,64 @@ import com.kampplus.hava.core.ui.component.FavoriteToggleButton
 import com.kampplus.hava.feature.favorites.presentation.FavoriteCityUiModel
 
 @Composable
-fun FavoriteCityCard(
-    item: FavoriteCityUiModel,
-    onClick: () -> Unit,
-    onRemoveClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun FavoriteCityCard(item: FavoriteCityUiModel, onClick: () -> Unit, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         onClick = onClick,
         modifier =
-            modifier.fillMaxWidth()
+        modifier.fillMaxWidth()
     ) {
         Row(
             modifier =
-                Modifier.padding(
-                    start = 16.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                ),
+            Modifier.padding(
+                start = 16.dp,
+                top = 8.dp,
+                bottom = 8.dp
+            ),
             verticalAlignment =
-                Alignment.CenterVertically
+            Alignment.CenterVertically
         ) {
-
             Icon(
                 Icons.Filled.LocationOn,
                 contentDescription = null,
                 tint =
-                    MaterialTheme
-                        .colorScheme
-                        .primary
+                MaterialTheme
+                    .colorScheme
+                    .primary
             )
 
             Column(
                 modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(
-                            horizontal = 12.dp
-                        )
+                Modifier
+                    .weight(1f)
+                    .padding(
+                        horizontal = 12.dp
+                    )
             ) {
                 Text(
                     text = item.title,
                     style =
-                        MaterialTheme
-                            .typography
-                            .titleMedium
+                    MaterialTheme
+                        .typography
+                        .titleMedium
                 )
 
                 Text(
                     text = item.subtitle,
                     style =
-                        MaterialTheme
-                            .typography
-                            .bodyMedium,
+                    MaterialTheme
+                        .typography
+                        .bodyMedium,
                     color =
-                        MaterialTheme
-                            .colorScheme
-                            .onSurfaceVariant
+                    MaterialTheme
+                        .colorScheme
+                        .onSurfaceVariant
                 )
             }
 
             FavoriteToggleButton(
                 isFavorite = true,
                 onClick =
-                    onRemoveClick
+                onRemoveClick
             )
         }
     }

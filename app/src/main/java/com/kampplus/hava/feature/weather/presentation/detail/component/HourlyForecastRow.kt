@@ -17,18 +17,15 @@ import androidx.compose.ui.unit.dp
 import com.kampplus.hava.feature.weather.presentation.model.HourlyUiModel
 
 @Composable
-fun HourlyForecastRow(
-    items: List<HourlyUiModel>,
-    modifier: Modifier = Modifier
-) {
+fun HourlyForecastRow(items: List<HourlyUiModel>, modifier: Modifier = Modifier) {
     LazyRow(
         modifier = modifier,
         contentPadding =
-            PaddingValues(
-                horizontal = 16.dp
-            ),
+        PaddingValues(
+            horizontal = 16.dp
+        ),
         horizontalArrangement =
-            Arrangement.spacedBy(8.dp)
+        Arrangement.spacedBy(8.dp)
     ) {
         items(
             items = items,
@@ -39,63 +36,63 @@ fun HourlyForecastRow(
 
             Card(
                 modifier =
-                    Modifier.width(72.dp)
+                Modifier.width(72.dp)
             ) {
                 Column(
                     modifier =
-                        Modifier
-                            .padding(
-                                vertical = 12.dp
-                            )
-                            .align(
-                                Alignment.CenterHorizontally
-                            ),
-                    horizontalAlignment =
-                        Alignment.CenterHorizontally,
-                    verticalArrangement =
-                        Arrangement.spacedBy(
-                            4.dp
+                    Modifier
+                        .padding(
+                            vertical = 12.dp
                         )
+                        .align(
+                            Alignment.CenterHorizontally
+                        ),
+                    horizontalAlignment =
+                    Alignment.CenterHorizontally,
+                    verticalArrangement =
+                    Arrangement.spacedBy(
+                        4.dp
+                    )
                 ) {
                     Text(
                         text =
-                            hour.timeText,
+                        hour.timeText,
                         style =
-                            MaterialTheme
-                                .typography
-                                .labelMedium
+                        MaterialTheme
+                            .typography
+                            .labelMedium
                     )
 
                     Text(
                         text =
-                            hour.emoji,
+                        hour.emoji,
                         style =
-                            MaterialTheme
-                                .typography
-                                .titleLarge
+                        MaterialTheme
+                            .typography
+                            .titleLarge
                     )
 
                     Text(
                         text =
-                            hour.temperatureText,
+                        hour.temperatureText,
                         style =
-                            MaterialTheme
-                                .typography
-                                .titleMedium
+                        MaterialTheme
+                            .typography
+                            .titleMedium
                     )
 
                     Text(
                         text =
-                            hour.precipitationText
-                                ?: " ",
+                        hour.precipitationText
+                            ?: " ",
                         style =
-                            MaterialTheme
-                                .typography
-                                .labelSmall,
+                        MaterialTheme
+                            .typography
+                            .labelSmall,
                         color =
-                            MaterialTheme
-                                .colorScheme
-                                .primary
+                        MaterialTheme
+                            .colorScheme
+                            .primary
                     )
                 }
             }

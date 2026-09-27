@@ -32,10 +32,10 @@ class OpenMeteoWeatherRemoteDataSourceTest {
             name = "İstanbul",
             region = "İstanbul",
             coordinates =
-                Coordinates(
-                    41.0138,
-                    28.9497
-                )
+            Coordinates(
+                41.0138,
+                28.9497
+            )
         )
 
     private val ankara =
@@ -43,7 +43,6 @@ class OpenMeteoWeatherRemoteDataSourceTest {
 
     @Before
     fun setUp() {
-
         server.start()
 
         val api =
@@ -77,250 +76,239 @@ class OpenMeteoWeatherRemoteDataSourceTest {
     }
 
     @Test
-    fun `multiple cities are fetched in one request and matched by order`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        readResource(
-                            "forecast_multi.json"
-                        )
+    fun `multiple cities are fetched in one request and matched by order`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    readResource(
+                        "forecast_multi.json"
                     )
-            )
-
-            val result =
-                dataSource
-                    .getCurrentWeather(
-                        listOf(
-                            istanbul,
-                            ankara
-                        )
-                    )
-
-            assertEquals(
-                1,
-                server.requestCount
-            )
-
-            val url =
-                server
-                    .takeRequest()
-                    .requestUrl!!
-
-            assertEquals(
-                "41.0138,39.92",
-                url.queryParameter(
-                    "latitude"
                 )
-            )
+        )
 
-            assertEquals(
-                "auto",
-                url.queryParameter(
-                    "timezone"
-                )
-            )
-
-            assertEquals(
-                listOf(
-                    "İstanbul",
-                    "Ankara"
-                ),
-                result.map {
-                    it.city.name
-                }
-            )
-
-            assertEquals(
-                18.4,
-                result
-                    .first()
-                    .current
-                    .temperatureC,
-                0.0
-            )
-
-            assertEquals(
-                WeatherCode(2),
-                result
-                    .last()
-                    .current
-                    .weatherCode
-            )
-        }
-
-    @Test
-    fun `single city uses object response`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        readResource(
-                            "forecast_single.json"
-                        )
-                    )
-            )
-
-            val result =
-                dataSource
-                    .getCurrentWeather(
-                        listOf(
-                            ankara
-                        )
-                    )
-
-            assertEquals(
-                14.5,
-                result
-                    .single()
-                    .current
-                    .temperatureC,
-                0.0
-            )
-
-            assertEquals(
-                LocalDateTime.of(
-                    2026,
-                    9,
-                    24,
-                    11,
-                    30
-                ),
-                result
-                    .single()
-                    .current
-                    .observedAt
-            )
-        }
-
-    @Test
-    fun `forecast maps columnar hourly and daily data and skips incomplete rows`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        readResource(
-                            "forecast_single.json"
-                        )
-                    )
-            )
-
-            val forecast =
-                dataSource
-                    .getForecast(
+        val result =
+            dataSource
+                .getCurrentWeather(
+                    listOf(
+                        istanbul,
                         ankara
                     )
-
-            with(
-                forecast.current
-            ) {
-                assertEquals(
-                    48,
-                    humidityPercent
                 )
 
-                assertEquals(
-                    9.7,
-                    windSpeedKmh!!,
-                    0.0
-                )
+        assertEquals(
+            1,
+            server.requestCount
+        )
 
-                assertTrue(
-                    isDay
-                )
+        val url =
+            server
+                .takeRequest()
+                .requestUrl!!
+
+        assertEquals(
+            "41.0138,39.92",
+            url.queryParameter(
+                "latitude"
+            )
+        )
+
+        assertEquals(
+            "auto",
+            url.queryParameter(
+                "timezone"
+            )
+        )
+
+        assertEquals(
+            listOf(
+                "İstanbul",
+                "Ankara"
+            ),
+            result.map {
+                it.city.name
             }
+        )
 
-            assertEquals(
-                listOf(
-                    0,
-                    2
-                ),
-                forecast
-                    .hourly
-                    .map {
-                        it.time.hour
-                    }
-            )
+        assertEquals(
+            18.4,
+            result
+                .first()
+                .current
+                .temperatureC,
+            0.0
+        )
 
-            assertEquals(
-                35,
-                forecast
-                    .hourly
-                    .last()
-                    .precipitationProbability
-            )
+        assertEquals(
+            WeatherCode(2),
+            result
+                .last()
+                .current
+                .weatherCode
+        )
+    }
 
-            assertEquals(
-                LocalDate.of(
-                    2026,
-                    9,
-                    25
-                ),
-                forecast
-                    .daily
-                    .last()
-                    .date
-            )
-
-            assertEquals(
-                6.2,
-                forecast
-                    .daily
-                    .last()
-                    .minTemperatureC,
-                0.0
-            )
-
-            val url =
-                server
-                    .takeRequest()
-                    .requestUrl!!
-
-            assertEquals(
-                "7",
-                url.queryParameter(
-                    "forecast_days"
-                )
-            )
-        }
-
-    @Test(
-        expected =
-            SerializationException::class
-    )
-    fun `missing current block is treated as malformed response`() =
-        runTest {
-
-            server.enqueue(
-                MockResponse()
-                    .setBody(
-                        """
-                        {
-                          "latitude":39.9,
-                          "longitude":32.8
-                        }
-                        """.trimIndent()
+    @Test
+    fun `single city uses object response`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    readResource(
+                        "forecast_single.json"
                     )
-            )
+                )
+        )
 
+        val result =
+            dataSource
+                .getCurrentWeather(
+                    listOf(
+                        ankara
+                    )
+                )
+
+        assertEquals(
+            14.5,
+            result
+                .single()
+                .current
+                .temperatureC,
+            0.0
+        )
+
+        assertEquals(
+            LocalDateTime.of(
+                2026,
+                9,
+                24,
+                11,
+                30
+            ),
+            result
+                .single()
+                .current
+                .observedAt
+        )
+    }
+
+    @Test
+    fun `forecast maps columnar hourly and daily data and skips incomplete rows`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    readResource(
+                        "forecast_single.json"
+                    )
+                )
+        )
+
+        val forecast =
             dataSource
                 .getForecast(
                     ankara
                 )
+
+        with(
+            forecast.current
+        ) {
+            assertEquals(
+                48,
+                humidityPercent
+            )
+
+            assertEquals(
+                9.7,
+                windSpeedKmh!!,
+                0.0
+            )
+
+            assertTrue(
+                isDay
+            )
         }
 
-    private fun readResource(
-        name: String
-    ): String =
-        checkNotNull(
-            javaClass
-                .classLoader
-                ?.getResource(
-                    name
+        assertEquals(
+            listOf(
+                0,
+                2
+            ),
+            forecast
+                .hourly
+                .map {
+                    it.time.hour
+                }
+        )
+
+        assertEquals(
+            35,
+            forecast
+                .hourly
+                .last()
+                .precipitationProbability
+        )
+
+        assertEquals(
+            LocalDate.of(
+                2026,
+                9,
+                25
+            ),
+            forecast
+                .daily
+                .last()
+                .date
+        )
+
+        assertEquals(
+            6.2,
+            forecast
+                .daily
+                .last()
+                .minTemperatureC,
+            0.0
+        )
+
+        val url =
+            server
+                .takeRequest()
+                .requestUrl!!
+
+        assertEquals(
+            "7",
+            url.queryParameter(
+                "forecast_days"
+            )
+        )
+    }
+
+    @Test(
+        expected =
+        SerializationException::class
+    )
+    fun `missing current block is treated as malformed response`() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setBody(
+                    """
+                        {
+                          "latitude":39.9,
+                          "longitude":32.8
+                        }
+                    """.trimIndent()
                 )
         )
-            .readText()
+
+        dataSource
+            .getForecast(
+                ankara
+            )
+    }
+
+    private fun readResource(name: String): String = checkNotNull(
+        javaClass
+            .classLoader
+            ?.getResource(
+                name
+            )
+    )
+        .readText()
 }

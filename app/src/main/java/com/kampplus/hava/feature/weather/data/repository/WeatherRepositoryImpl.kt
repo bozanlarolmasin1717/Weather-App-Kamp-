@@ -18,30 +18,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class WeatherRepositoryImpl @Inject constructor(
-    private val cityCatalog:
-    CityCatalog,
-    private val remoteDataSource:
-    WeatherRemoteDataSource,
-    private val errorMapper:
-    ErrorMapper,
+    private val cityCatalog: CityCatalog,
+    private val remoteDataSource: WeatherRemoteDataSource,
+    private val errorMapper: ErrorMapper,
     @param:IoDispatcher
-    private val ioDispatcher:
-    CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher
 ) : WeatherRepository {
 
-    override fun getCityWeathers():
-        Flow<
-            AppResult<
-                List<CityWeather>
-                >
-            > =
-        getCurrentWeather(
-            cityCatalog.cities()
-        )
+    override fun getCityWeathers(): Flow<
+        AppResult<
+            List<CityWeather>
+            >
+        > = getCurrentWeather(
+        cityCatalog.cities()
+    )
 
-    override fun getCurrentWeather(
-        cities: List<City>
-    ): Flow<
+    override fun getCurrentWeather(cities: List<City>): Flow<
         AppResult<
             List<CityWeather>
             >
@@ -60,17 +52,14 @@ class WeatherRepositoryImpl @Inject constructor(
                 ioDispatcher
             )
 
-    override suspend fun getForecast(
-        city: City
-    ): AppResult<Forecast> =
-        withContext(
-            ioDispatcher
-        ) {
-            errorMapper.runCatchingApp {
-                remoteDataSource
-                    .getForecast(
-                        city
-                    )
-            }
+    override suspend fun getForecast(city: City): AppResult<Forecast> = withContext(
+        ioDispatcher
+    ) {
+        errorMapper.runCatchingApp {
+            remoteDataSource
+                .getForecast(
+                    city
+                )
         }
+    }
 }

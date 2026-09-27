@@ -10,6 +10,5 @@ class GetCityWeathersUseCase @Inject constructor(
     private val repository: WeatherRepository
 ) {
 
-    operator fun invoke(): Flow<AppResult<List<CityWeather>>> =
-        repository.getCityWeathers()
+    operator fun invoke(): Flow<AppResult<List<CityWeather>>> = repository.getCityWeathers()
 }

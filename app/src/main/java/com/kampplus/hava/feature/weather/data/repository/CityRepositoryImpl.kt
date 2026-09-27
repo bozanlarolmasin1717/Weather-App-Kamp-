@@ -12,25 +12,19 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 class CityRepositoryImpl @Inject constructor(
-    private val remoteDataSource:
-    CityRemoteDataSource,
-    private val errorMapper:
-    ErrorMapper,
+    private val remoteDataSource: CityRemoteDataSource,
+    private val errorMapper: ErrorMapper,
     @param:IoDispatcher
-    private val ioDispatcher:
-    CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher
 ) : CityRepository {
 
-    override suspend fun search(
-        query: String
-    ): AppResult<List<City>> =
-        withContext(
-            ioDispatcher
-        ) {
-            errorMapper.runCatchingApp {
-                remoteDataSource.search(
-                    query
-                )
-            }
+    override suspend fun search(query: String): AppResult<List<City>> = withContext(
+        ioDispatcher
+    ) {
+        errorMapper.runCatchingApp {
+            remoteDataSource.search(
+                query
+            )
         }
+    }
 }

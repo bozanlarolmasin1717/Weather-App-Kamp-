@@ -16,14 +16,8 @@ import dagger.hilt.components.SingletonComponent
 abstract class FavoritesDataModule {
 
     @Binds
-    abstract fun bindFavoriteCityRepository(
-        impl:
-        FavoriteCityRepositoryImpl
-    ): FavoriteCityRepository
+    abstract fun bindFavoriteCityRepository(impl: FavoriteCityRepositoryImpl): FavoriteCityRepository
 
     @Binds
-    abstract fun bindFavoriteCityLocalDataSource(
-        impl:
-        RoomFavoriteCityDataSource
-    ): FavoriteCityLocalDataSource
+    abstract fun bindFavoriteCityLocalDataSource(impl: RoomFavoriteCityDataSource): FavoriteCityLocalDataSource
 }

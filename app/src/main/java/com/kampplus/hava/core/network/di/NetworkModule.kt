@@ -28,96 +28,78 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson(): Json =
-        Json {
-            ignoreUnknownKeys = true
-            explicitNulls = false
-            coerceInputValues = true
-        }
+    fun provideJson(): Json = Json {
+        ignoreUnknownKeys = true
+        explicitNulls = false
+        coerceInputValues = true
+    }
 
     @Provides
     @Singleton
-    fun provideConverterFactory(
-        json: Json
-    ): Converter.Factory =
-        json.asConverterFactory(
-            "application/json".toMediaType()
-        )
+    fun provideConverterFactory(json: Json): Converter.Factory = json.asConverterFactory(
+        "application/json".toMediaType()
+    )
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
         @ApplicationContext
         context: Context
-    ): OkHttpClient =
-        OkHttpClient.Builder()
-            .connectTimeout(
-                TIMEOUT_SECONDS,
-                TimeUnit.SECONDS
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(
+            TIMEOUT_SECONDS,
+            TimeUnit.SECONDS
+        )
+        .readTimeout(
+            TIMEOUT_SECONDS,
+            TimeUnit.SECONDS
+        )
+        .cache(
+            Cache(
+                File(
+                    context.cacheDir,
+                    "http"
+                ),
+                CACHE_SIZE_BYTES
             )
-            .readTimeout(
-                TIMEOUT_SECONDS,
-                TimeUnit.SECONDS
-            )
-            .cache(
-                Cache(
-                    File(
-                        context.cacheDir,
-                        "http"
-                    ),
-                    CACHE_SIZE_BYTES
+        )
+        .apply {
+            if (BuildConfig.DEBUG) {
+                addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(
+                            HttpLoggingInterceptor
+                                .Level
+                                .BASIC
+                        )
                 )
-            )
-            .apply {
-                if (BuildConfig.DEBUG) {
-                    addInterceptor(
-                        HttpLoggingInterceptor()
-                            .setLevel(
-                                HttpLoggingInterceptor
-                                    .Level
-                                    .BASIC
-                            )
-                    )
-                }
             }
-            .build()
+        }
+        .build()
 
     @Provides
     @Singleton
     @ForecastRetrofit
-    fun provideForecastRetrofit(
-        client: OkHttpClient,
-        converterFactory: Converter.Factory
-    ): Retrofit =
-        retrofit(
-            BuildConfig.FORECAST_BASE_URL,
-            client,
-            converterFactory
-        )
+    fun provideForecastRetrofit(client: OkHttpClient, converterFactory: Converter.Factory): Retrofit = retrofit(
+        BuildConfig.FORECAST_BASE_URL,
+        client,
+        converterFactory
+    )
 
     @Provides
     @Singleton
     @GeocodingRetrofit
-    fun provideGeocodingRetrofit(
-        client: OkHttpClient,
-        converterFactory: Converter.Factory
-    ): Retrofit =
-        retrofit(
-            BuildConfig.GEOCODING_BASE_URL,
-            client,
+    fun provideGeocodingRetrofit(client: OkHttpClient, converterFactory: Converter.Factory): Retrofit = retrofit(
+        BuildConfig.GEOCODING_BASE_URL,
+        client,
+        converterFactory
+    )
+
+    private fun retrofit(baseUrl: String, client: OkHttpClient, converterFactory: Converter.Factory): Retrofit = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(client)
+        .addConverterFactory(
             converterFactory
         )
-
-    private fun retrofit(
-        baseUrl: String,
-        client: OkHttpClient,
-        converterFactory: Converter.Factory
-    ): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(client)
-            .addConverterFactory(
-                converterFactory
-            )
-            .build()
+        .build()
 }

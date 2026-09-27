@@ -18,7 +18,6 @@ class NetworkErrorMapperTest {
 
     @Test
     fun `no internet and timeouts map to network error`() {
-
         assertEquals(
             AppError.Network,
             mapper.map(
@@ -36,7 +35,6 @@ class NetworkErrorMapperTest {
 
     @Test
     fun `http 404 maps to not found, other codes to server error`() {
-
         assertEquals(
             AppError.NotFound,
             mapper.map(
@@ -61,7 +59,6 @@ class NetworkErrorMapperTest {
 
     @Test
     fun `malformed json maps to parse error`() {
-
         assertEquals(
             AppError.Parse,
             mapper.map(
@@ -74,7 +71,6 @@ class NetworkErrorMapperTest {
 
     @Test
     fun `anything else is unknown`() {
-
         assertTrue(
             mapper.map(
                 IllegalStateException()
@@ -82,13 +78,10 @@ class NetworkErrorMapperTest {
         )
     }
 
-    private fun httpException(
-        code: Int
-    ) =
-        HttpException(
-            Response.error<Unit>(
-                code,
-                "".toResponseBody()
-            )
+    private fun httpException(code: Int) = HttpException(
+        Response.error<Unit>(
+            code,
+            "".toResponseBody()
         )
+    )
 }

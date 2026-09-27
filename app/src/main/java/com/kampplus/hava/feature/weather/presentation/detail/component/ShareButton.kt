@@ -10,10 +10,7 @@ import androidx.compose.ui.res.stringResource
 import com.kampplus.hava.R
 
 @Composable
-fun ShareButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ShareButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     IconButton(
         onClick = onClick,
         modifier = modifier
@@ -21,9 +18,9 @@ fun ShareButton(
         Icon(
             Icons.Filled.Share,
             contentDescription =
-                stringResource(
-                    R.string.action_share
-                )
+            stringResource(
+                R.string.action_share
+            )
         )
     }
 }

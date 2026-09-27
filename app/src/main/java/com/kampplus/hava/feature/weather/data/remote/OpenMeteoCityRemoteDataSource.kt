@@ -9,14 +9,11 @@ class OpenMeteoCityRemoteDataSource @Inject constructor(
     private val api: OpenMeteoGeocodingApi
 ) : CityRemoteDataSource {
 
-    override suspend fun search(
-        query: String
-    ): List<City> =
-        api.search(
-            name = query
-        )
-            .results
-            .map {
-                it.toDomain()
-            }
+    override suspend fun search(query: String): List<City> = api.search(
+        name = query
+    )
+        .results
+        .map {
+            it.toDomain()
+        }
 }

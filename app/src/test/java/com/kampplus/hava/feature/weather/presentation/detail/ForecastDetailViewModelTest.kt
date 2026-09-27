@@ -37,187 +37,177 @@ class ForecastDetailViewModelTest {
             InMemoryFavoriteCityDataSource()
         )
 
-    private fun createViewModel() =
-        ForecastDetailViewModel(
-            savedStateHandle =
-                SavedStateHandle(
-                    mapOf(
-                        ForecastDestination
-                            .ARG_CITY_ID to
-                            311046L,
-                        ForecastDestination
-                            .ARG_NAME to
-                            "İzmir",
-                        ForecastDestination
-                            .ARG_REGION to
-                            "İzmir",
-                        ForecastDestination
-                            .ARG_COUNTRY to
-                            "Türkiye",
-                        ForecastDestination
-                            .ARG_LATITUDE to
-                            38.4127,
-                        ForecastDestination
-                            .ARG_LONGITUDE to
-                            27.1384
-                    )
-                ),
-            getForecast =
-                GetForecastUseCase(
-                    repository
-                ),
-            observeFavoriteCityIds =
-                ObserveFavoriteCityIdsUseCase(
-                    favoritesRepository
-                ),
-            toggleFavoriteCity =
-                ToggleFavoriteCityUseCase(
-                    favoritesRepository
-                ),
-            uiMapper =
-                testUiMapper()
+    private fun createViewModel() = ForecastDetailViewModel(
+        savedStateHandle =
+        SavedStateHandle(
+            mapOf(
+                ForecastDestination
+                    .ARG_CITY_ID to
+                    311046L,
+                ForecastDestination
+                    .ARG_NAME to
+                    "İzmir",
+                ForecastDestination
+                    .ARG_REGION to
+                    "İzmir",
+                ForecastDestination
+                    .ARG_COUNTRY to
+                    "Türkiye",
+                ForecastDestination
+                    .ARG_LATITUDE to
+                    38.4127,
+                ForecastDestination
+                    .ARG_LONGITUDE to
+                    27.1384
+            )
+        ),
+        getForecast =
+        GetForecastUseCase(
+            repository
+        ),
+        observeFavoriteCityIds =
+        ObserveFavoriteCityIdsUseCase(
+            favoritesRepository
+        ),
+        toggleFavoriteCity =
+        ToggleFavoriteCityUseCase(
+            favoritesRepository
+        ),
+        uiMapper =
+        testUiMapper()
+    )
+
+    @Test
+    fun `requests forecast for the city passed through navigation`() = runTest {
+        repository.forecastResult = {
+            AppResult.Success(
+                forecast()
+            )
+        }
+
+        createViewModel()
+            .uiState
+            .test {
+                assertEquals(
+                    UiState.Loading,
+                    awaitItem()
+                )
+
+                val model =
+                    (
+                        awaitItem()
+                            as UiState.Success
+                        )
+                        .data
+
+                assertEquals(
+                    "İzmir",
+                    model.cityName
+                )
+
+                assertEquals(
+                    "21°",
+                    model.temperatureText
+                )
+
+                assertEquals(
+                    "12 km/sa",
+                    model.windText
+                )
+            }
+
+        val requested =
+            repository
+                .requestedForecasts
+                .single()
+
+        assertEquals(
+            38.4127,
+            requested
+                .coordinates
+                .latitude,
+            0.0
         )
 
+        assertEquals(
+            311046L,
+            requested.id
+        )
+    }
+
     @Test
-    fun `requests forecast for the city passed through navigation`() =
-        runTest {
-
-            repository.forecastResult = {
-                AppResult.Success(
-                    forecast()
-                )
-            }
-
-            createViewModel()
-                .uiState
-                .test {
-
-                    assertEquals(
-                        UiState.Loading,
-                        awaitItem()
-                    )
-
-                    val model =
-                        (
-                            awaitItem()
-                                as UiState.Success
-                            )
-                            .data
-
-                    assertEquals(
-                        "İzmir",
-                        model.cityName
-                    )
-
-                    assertEquals(
-                        "21°",
-                        model.temperatureText
-                    )
-
-                    assertEquals(
-                        "12 km/sa",
-                        model.windText
-                    )
-                }
-
-            val requested =
-                repository
-                    .requestedForecasts
-                    .single()
-
-            assertEquals(
-                38.4127,
-                requested
-                    .coordinates
-                    .latitude,
-                0.0
-            )
-
-            assertEquals(
-                311046L,
-                requested.id
+    fun `hourly starts from current hour and daily starts with today`() = runTest {
+        repository.forecastResult = {
+            AppResult.Success(
+                forecast()
             )
         }
 
-    @Test
-    fun `hourly starts from current hour and daily starts with today`() =
-        runTest {
+        createViewModel()
+            .uiState
+            .test {
+                awaitItem()
 
-            repository.forecastResult = {
-                AppResult.Success(
-                    forecast()
+                val model =
+                    (
+                        awaitItem()
+                            as UiState.Success
+                        )
+                        .data
+
+                assertEquals(
+                    24,
+                    model.hourly.size
+                )
+
+                assertEquals(
+                    "12:00",
+                    model
+                        .hourly
+                        .first()
+                        .timeText
+                )
+
+                assertEquals(
+                    UiText.Resource(
+                        R.string.today
+                    ),
+                    model
+                        .daily
+                        .first()
+                        .dayLabel
+                )
+
+                assertEquals(
+                    "%30",
+                    model
+                        .daily
+                        .first()
+                        .precipitationText
                 )
             }
+    }
 
-            createViewModel()
-                .uiState
-                .test {
+    @Test
+    fun `shows error when forecast fails`() = runTest {
+        repository.forecastResult = {
+            AppResult.Failure(
+                AppError.Network
+            )
+        }
 
+        createViewModel()
+            .uiState
+            .test {
+                assertEquals(
+                    UiState.Loading,
                     awaitItem()
+                )
 
-                    val model =
-                        (
-                            awaitItem()
-                                as UiState.Success
-                            )
-                            .data
-
-                    assertEquals(
-                        24,
-                        model.hourly.size
-                    )
-
-                    assertEquals(
-                        "12:00",
-                        model
-                            .hourly
-                            .first()
-                            .timeText
-                    )
-
-                    assertEquals(
-                        UiText.Resource(
-                            R.string.today
-                        ),
-                        model
-                            .daily
-                            .first()
-                            .dayLabel
-                    )
-
-                    assertEquals(
-                        "%30",
-                        model
-                            .daily
-                            .first()
-                            .precipitationText
-                    )
-                }
-        }
-
-    @Test
-    fun `shows error when forecast fails`() =
-        runTest {
-
-            repository.forecastResult = {
-                AppResult.Failure(
-                    AppError.Network
+                assertTrue(
+                    awaitItem()
+                        is UiState.Error
                 )
             }
-
-            createViewModel()
-                .uiState
-                .test {
-
-                    assertEquals(
-                        UiState.Loading,
-                        awaitItem()
-                    )
-
-                    assertTrue(
-                        awaitItem()
-                            is UiState.Error
-                    )
-                }
-        }
+    }
 }

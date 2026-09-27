@@ -33,13 +33,7 @@ class TurkishCityCatalog @Inject constructor() : CityCatalog {
             city(317109, "Denizli", "Denizli", 37.7742, 29.0875)
         )
 
-        fun city(
-            id: Long,
-            name: String,
-            region: String,
-            latitude: Double,
-            longitude: Double
-        ) = City(
+        fun city(id: Long, name: String, region: String, latitude: Double, longitude: Double) = City(
             id = id,
             name = name,
             region = region,

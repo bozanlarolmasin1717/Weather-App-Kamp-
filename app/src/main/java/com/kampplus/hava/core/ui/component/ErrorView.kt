@@ -23,69 +23,64 @@ import com.kampplus.hava.R
 import com.kampplus.hava.core.ui.theme.HavaTheme
 
 @Composable
-fun ErrorView(
-    message: String,
-    modifier: Modifier = Modifier,
-    onRetry: (() -> Unit)? = null
-) {
+fun ErrorView(message: String, modifier: Modifier = Modifier, onRetry: (() -> Unit)? = null) {
     Column(
         modifier =
-            modifier.padding(32.dp),
+        modifier.padding(32.dp),
         horizontalAlignment =
-            Alignment.CenterHorizontally,
+        Alignment.CenterHorizontally,
         verticalArrangement =
-            Arrangement.spacedBy(
-                12.dp
-            )
+        Arrangement.spacedBy(
+            12.dp
+        )
     ) {
         Icon(
             imageVector =
-                Icons.Filled.Warning,
+            Icons.Filled.Warning,
             contentDescription =
-                null,
+            null,
             modifier =
-                Modifier.size(64.dp),
+            Modifier.size(64.dp),
             tint =
-                MaterialTheme
-                    .colorScheme
-                    .error
+            MaterialTheme
+                .colorScheme
+                .error
         )
 
         Text(
             text = message,
             style =
-                MaterialTheme
-                    .typography
-                    .titleMedium,
+            MaterialTheme
+                .typography
+                .titleMedium,
             textAlign =
-                TextAlign.Center
+            TextAlign.Center
         )
 
         onRetry?.let {
-
             Button(
                 onClick = it
             ) {
                 Icon(
                     imageVector =
-                        Icons.Filled.Refresh,
+                    Icons.Filled.Refresh,
                     contentDescription =
-                        null,
+                    null,
                     modifier =
-                        Modifier.size(
-                            ButtonDefaults.IconSize
-                        )
+                    Modifier.size(
+                        ButtonDefaults.IconSize
+                    )
                 )
 
                 Text(
                     text =
-                        stringResource(
-                            R.string.action_retry
-                        ),
+                    stringResource(
+                        R.string.action_retry
+                    ),
                     modifier =
-                        Modifier.padding(
-                            start = 8.dp
-                        )
+                    Modifier.padding(
+                        start = 8.dp
+                    )
                 )
             }
         }
@@ -98,7 +93,7 @@ private fun ErrorViewPreview() {
     HavaTheme {
         ErrorView(
             message =
-                "İnternet bağlantısı yok.",
+            "İnternet bağlantısı yok.",
             onRetry = {}
         )
     }

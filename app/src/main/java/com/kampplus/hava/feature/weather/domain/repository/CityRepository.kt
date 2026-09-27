@@ -5,7 +5,5 @@ import com.kampplus.hava.feature.weather.domain.model.City
 
 interface CityRepository {
 
-    suspend fun search(
-        query: String
-    ): AppResult<List<City>>
+    suspend fun search(query: String): AppResult<List<City>>
 }

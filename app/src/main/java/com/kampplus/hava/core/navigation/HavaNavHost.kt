@@ -12,37 +12,31 @@ import com.kampplus.hava.feature.weather.presentation.list.CityListRoute
 import com.kampplus.hava.feature.weather.presentation.model.toCity
 
 @Composable
-fun HavaNavHost(
-    navController:
-    NavHostController,
-    modifier: Modifier = Modifier
-) {
+fun HavaNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     val openForecast:
-            (City) -> Unit = { city ->
+        (City) -> Unit = { city ->
 
-        navController.navigate(
-            city.toDestination()
-        )
-    }
+            navController.navigate(
+                city.toDestination()
+            )
+        }
 
     NavHost(
         navController = navController,
         startDestination =
-            ListDestination,
+        ListDestination,
         modifier = modifier
     ) {
-
         composable<ListDestination> {
             CityListRoute(
                 onCityClick =
-                    openForecast
+                openForecast
             )
         }
 
         composable<FavoritesDestination> {
             FavoritesRoute(
-                onCityClick = {
-                        favorite ->
+                onCityClick = { favorite ->
 
                     openForecast(
                         favorite.toCity()
@@ -54,20 +48,19 @@ fun HavaNavHost(
         composable<ForecastDestination> {
             ForecastDetailRoute(
                 onBack =
-                    navController::navigateUp
+                navController::navigateUp
             )
         }
     }
 }
 
-private fun City.toDestination() =
-    ForecastDestination(
-        cityId = id,
-        name = name,
-        region = region,
-        country = country,
-        latitude =
-            coordinates.latitude,
-        longitude =
-            coordinates.longitude
-    )
+private fun City.toDestination() = ForecastDestination(
+    cityId = id,
+    name = name,
+    region = region,
+    country = country,
+    latitude =
+    coordinates.latitude,
+    longitude =
+    coordinates.longitude
+)

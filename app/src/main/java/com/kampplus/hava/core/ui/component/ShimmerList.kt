@@ -31,92 +31,88 @@ import androidx.compose.ui.unit.dp
 import com.kampplus.hava.core.ui.theme.HavaTheme
 
 @Composable
-fun ShimmerList(
-    modifier: Modifier = Modifier,
-    itemCount: Int = 6
-) {
+fun ShimmerList(modifier: Modifier = Modifier, itemCount: Int = 6) {
     val brush =
         shimmerBrush()
 
     Column(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .testTag("shimmer"),
+        modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .testTag("shimmer"),
         verticalArrangement =
-            Arrangement.spacedBy(
-                12.dp
-            )
+        Arrangement.spacedBy(
+            12.dp
+        )
     ) {
         repeat(itemCount) {
-
             Card(
                 modifier =
-                    Modifier.fillMaxWidth()
+                Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier =
-                        Modifier.padding(
-                            12.dp
-                        ),
+                    Modifier.padding(
+                        12.dp
+                    ),
                     verticalAlignment =
-                        Alignment.CenterVertically
+                    Alignment.CenterVertically
                 ) {
                     Box(
                         modifier =
-                            Modifier
-                                .size(52.dp)
-                                .background(
-                                    brush,
-                                    RoundedCornerShape(
-                                        12.dp
-                                    )
+                        Modifier
+                            .size(52.dp)
+                            .background(
+                                brush,
+                                RoundedCornerShape(
+                                    12.dp
                                 )
+                            )
                     )
 
                     Column(
                         modifier =
-                            Modifier.padding(
-                                start = 12.dp
-                            ),
+                        Modifier.padding(
+                            start = 12.dp
+                        ),
                         verticalArrangement =
-                            Arrangement.spacedBy(
-                                8.dp
-                            )
+                        Arrangement.spacedBy(
+                            8.dp
+                        )
                     ) {
                         Box(
                             modifier =
-                                Modifier
-                                    .fillMaxWidth(
-                                        0.8f
+                            Modifier
+                                .fillMaxWidth(
+                                    0.8f
+                                )
+                                .height(
+                                    16.dp
+                                )
+                                .background(
+                                    brush,
+                                    RoundedCornerShape(
+                                        4.dp
                                     )
-                                    .height(
-                                        16.dp
-                                    )
-                                    .background(
-                                        brush,
-                                        RoundedCornerShape(
-                                            4.dp
-                                        )
-                                    )
+                                )
                         )
 
                         Box(
                             modifier =
-                                Modifier
-                                    .fillMaxWidth(
-                                        0.5f
+                            Modifier
+                                .fillMaxWidth(
+                                    0.5f
+                                )
+                                .height(
+                                    12.dp
+                                )
+                                .background(
+                                    brush,
+                                    RoundedCornerShape(
+                                        4.dp
                                     )
-                                    .height(
-                                        12.dp
-                                    )
-                                    .background(
-                                        brush,
-                                        RoundedCornerShape(
-                                            4.dp
-                                        )
-                                    )
+                                )
                         )
                     }
                 }
@@ -126,9 +122,7 @@ fun ShimmerList(
 }
 
 @Composable
-private fun shimmerBrush():
-    Brush {
-
+private fun shimmerBrush(): Brush {
     val base =
         MaterialTheme
             .colorScheme
@@ -140,47 +134,47 @@ private fun shimmerBrush():
             .surface
 
     val translate by
-    rememberInfiniteTransition(
-        label = "shimmer"
-    )
-        .animateFloat(
-            initialValue = 0f,
-            targetValue =
+        rememberInfiniteTransition(
+            label = "shimmer"
+        )
+            .animateFloat(
+                initialValue = 0f,
+                targetValue =
                 SHIMMER_DISTANCE,
-            animationSpec =
+                animationSpec =
                 infiniteRepeatable(
                     animation =
-                        tween(
-                            durationMillis =
-                                1_100,
-                            easing =
-                                LinearEasing
-                        ),
+                    tween(
+                        durationMillis =
+                        1_100,
+                        easing =
+                        LinearEasing
+                    ),
                     repeatMode =
-                        RepeatMode.Restart
+                    RepeatMode.Restart
                 ),
-            label =
+                label =
                 "shimmerTranslate"
-        )
+            )
 
     return Brush.linearGradient(
         colors =
-            listOf(
-                base,
-                highlight,
-                base
-            ),
+        listOf(
+            base,
+            highlight,
+            base
+        ),
         start =
-            Offset(
-                translate -
-                    SHIMMER_WIDTH,
-                0f
-            ),
+        Offset(
+            translate -
+                SHIMMER_WIDTH,
+            0f
+        ),
         end =
-            Offset(
-                translate,
-                0f
-            )
+        Offset(
+            translate,
+            0f
+        )
     )
 }
 
