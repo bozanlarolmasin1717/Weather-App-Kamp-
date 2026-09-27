@@ -1,6 +1,7 @@
 package com.kampplus.hava.feature.favorites.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import com.kampplus.hava.core.common.error.AppError
 import com.kampplus.hava.core.common.result.AppResult
 import com.kampplus.hava.core.navigation.ForecastDestination
 import com.kampplus.hava.core.ui.state.UiState
@@ -8,12 +9,15 @@ import com.kampplus.hava.feature.favorites.data.local.InMemoryFavoriteCityDataSo
 import com.kampplus.hava.feature.favorites.data.repository.FavoriteCityRepositoryImpl
 import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCitiesUseCase
 import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
+import com.kampplus.hava.feature.favorites.domain.usecase.RestoreFavoriteCityUseCase
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
+import com.kampplus.hava.feature.weather.domain.usecase.GetCurrentWeatherUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
 import com.kampplus.hava.feature.weather.presentation.detail.ForecastDetailViewModel
 import com.kampplus.hava.feature.weather.presentation.list.CityListViewModel
+import com.kampplus.hava.feature.weather.presentation.model.toFavorite
 import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
@@ -131,7 +135,10 @@ class FavoritesSyncTest {
             ObserveFavoriteCitiesUseCase(
                 favoritesRepository
             ),
-            toggle
+            GetCurrentWeatherUseCase(weatherRepository),
+            toggle,
+            RestoreFavoriteCityUseCase(favoritesRepository),
+            testUiMapper()
         )
     }
 
@@ -164,6 +171,13 @@ class FavoritesSyncTest {
                 )
                 .data
                 .map { it.id }
+        )
+
+        assertEquals(
+            "21°",
+            (
+                favoritesViewModel.uiState.value as UiState.Success
+                ).data.single().temperatureText
         )
     }
 
@@ -216,7 +230,7 @@ class FavoritesSyncTest {
 
         assertEquals(
             FavoritesEvent.ShowUndo(
-                cityName = ankara.name
+                removedCity = ankara.toFavorite()
             ),
             favoritesViewModel
                 .events
@@ -228,13 +242,63 @@ class FavoritesSyncTest {
         )
 
         favoritesViewModel
-            .onUndoRemove()
+            .onUndoRemove(ankara.toFavorite())
 
         runCurrent()
 
         assertTrue(
             listIsFavorite()
         )
+    }
+
+    @Test
+    fun `undo restores the matching city when removals happen quickly`() = runTest {
+        val berlin = city(
+            id = 2_950_159,
+            name = "Berlin",
+            region = "Berlin",
+            country = "Almanya"
+        )
+        backgroundScope.launch {
+            favoritesViewModel.uiState.collect {}
+        }
+        toggle(ankara.toFavorite())
+        toggle(berlin.toFavorite())
+        runCurrent()
+
+        favoritesViewModel.onRemoveFavorite(ankara.id)
+        runCurrent()
+        val ankaraEvent = favoritesViewModel.events.first() as FavoritesEvent.ShowUndo
+
+        favoritesViewModel.onRemoveFavorite(berlin.id)
+        runCurrent()
+        val berlinEvent = favoritesViewModel.events.first() as FavoritesEvent.ShowUndo
+
+        favoritesViewModel.onUndoRemove(ankaraEvent.removedCity)
+        runCurrent()
+
+        assertEquals(ankara.id, ankaraEvent.removedCity.id)
+        assertEquals(berlin.id, berlinEvent.removedCity.id)
+        assertEquals(
+            setOf(ankara.id),
+            observeIds().first()
+        )
+    }
+
+    @Test
+    fun `saved cities remain visible when weather enrichment fails`() = runTest {
+        weatherRepository.currentWeatherResult = {
+            AppResult.Failure(AppError.Network)
+        }
+        toggle(ankara.toFavorite())
+        backgroundScope.launch {
+            favoritesViewModel.uiState.collect {}
+        }
+        runCurrent()
+
+        val item = (favoritesViewModel.uiState.value as UiState.Success).data.single()
+        assertEquals(ankara.name, item.title)
+        assertEquals(null, item.temperatureText)
     }
 
     private fun TestScope.subscribeAll() {

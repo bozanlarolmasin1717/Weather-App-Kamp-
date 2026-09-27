@@ -49,7 +49,7 @@ fun FavoritesRoute(
                                     resources.getString(
                                         R.string
                                             .favorites_removed,
-                                        event.cityName
+                                        event.removedCity.name
                                     ),
                                     actionLabel =
                                     resources.getString(
@@ -64,8 +64,7 @@ fun FavoritesRoute(
                             result ==
                             SnackbarResult.ActionPerformed
                         ) {
-                            viewModel
-                                .onUndoRemove()
+                            viewModel.onUndoRemove(event.removedCity)
                         }
                     }
                 }
