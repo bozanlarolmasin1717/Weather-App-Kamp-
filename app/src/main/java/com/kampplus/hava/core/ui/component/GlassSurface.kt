@@ -29,7 +29,7 @@ fun GlassSurface(
     Box(
         modifier = modifier
             .shadow(
-                elevation = 18.dp,
+                elevation = 10.dp,
                 shape = shape,
                 ambientColor = HavaColors.GlassShadow,
                 spotColor = HavaColors.GlassShadow

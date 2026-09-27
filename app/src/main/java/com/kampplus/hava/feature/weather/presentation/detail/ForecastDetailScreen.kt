@@ -32,7 +32,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -185,6 +188,10 @@ private fun ForecastContent(forecast: ForecastUiModel, modifier: Modifier = Modi
 
 @Composable
 private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
+    val fontScale = LocalDensity.current.fontScale
+    val temperatureSize = (96f / fontScale.coerceAtLeast(1f)).sp
+    val conditionDescription = forecast.conditionLabel.asString()
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -209,15 +216,19 @@ private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier =
         Text(
             text = forecast.temperatureText,
             style = MaterialTheme.typography.displayLarge.copy(
-                fontSize = 96.sp,
-                lineHeight = 100.sp,
+                fontSize = temperatureSize,
+                lineHeight = temperatureSize * 1.05f,
                 fontWeight = FontWeight.ExtraLight
-            )
+            ),
+            maxLines = 1
         )
 
         Text(
             text = "${forecast.conditionEmoji} ${forecast.conditionLabel.asString()}",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.clearAndSetSemantics {
+                contentDescription = conditionDescription
+            }
         )
 
         forecast.feelsLikeText?.let {

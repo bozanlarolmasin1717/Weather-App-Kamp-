@@ -12,6 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.core.ui.component.GlassSurface
 import com.kampplus.hava.feature.weather.presentation.model.HourlyUiModel
@@ -33,6 +35,7 @@ fun HourlyForecastRow(items: List<HourlyUiModel>, modifier: Modifier = Modifier)
                 it.time
             }
         ) { hour ->
+            val conditionDescription = hour.conditionLabel?.asString().orEmpty()
 
             GlassSurface(
                 modifier = Modifier.width(76.dp),
@@ -62,6 +65,9 @@ fun HourlyForecastRow(items: List<HourlyUiModel>, modifier: Modifier = Modifier)
                     Text(
                         text =
                         hour.emoji,
+                        modifier = Modifier.clearAndSetSemantics {
+                            contentDescription = conditionDescription
+                        },
                         style =
                         MaterialTheme
                             .typography

@@ -10,12 +10,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.feature.weather.presentation.model.DailyUiModel
 
 @Composable
 fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
+    val conditionDescription = day.conditionLabel?.asString().orEmpty()
+
     Row(
         modifier =
         modifier
@@ -58,13 +62,14 @@ fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
         Text(
             text =
             day.emoji,
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .clearAndSetSemantics {
+                    contentDescription = conditionDescription
+                },
             style =
             MaterialTheme.typography
-                .titleLarge,
-            modifier =
-            Modifier.padding(
-                horizontal = 12.dp
-            )
+                .titleLarge
         )
 
         Text(

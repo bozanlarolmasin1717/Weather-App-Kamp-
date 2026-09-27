@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,6 +105,7 @@ fun CityWeatherCard(item: CityWeatherUiModel, onClick: () -> Unit, onFavoriteCli
 
                     Text(
                         text = item.conditionEmoji,
+                        modifier = Modifier.clearAndSetSemantics {},
                         fontSize = 28.sp
                     )
                 }

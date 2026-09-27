@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,6 +85,7 @@ fun FavoriteCityCard(item: FavoriteCityUiModel, onClick: () -> Unit, onRemoveCli
                 item.conditionEmoji?.let {
                     Text(
                         text = it,
+                        modifier = Modifier.clearAndSetSemantics {},
                         fontSize = 26.sp
                     )
                 }

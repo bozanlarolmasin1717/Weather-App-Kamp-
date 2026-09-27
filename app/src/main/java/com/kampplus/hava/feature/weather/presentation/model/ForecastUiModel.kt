@@ -47,6 +47,7 @@ data class HourlyUiModel(
     val time: LocalDateTime,
     val timeText: String,
     val emoji: String,
+    val conditionLabel: UiText? = null,
     val temperatureText: String,
     val precipitationText: String?
 )
@@ -56,6 +57,7 @@ data class DailyUiModel(
     val dateText: String = "",
     val dayLabel: UiText,
     val emoji: String,
+    val conditionLabel: UiText? = null,
     val minText: String,
     val maxText: String,
     val precipitationText: String?

@@ -139,6 +139,7 @@ class WeatherUiMapper @Inject constructor(
                         conditionUi(
                             hour.weatherCode
                         ).emoji,
+                        conditionLabel = conditionUi(hour.weatherCode).label,
                         temperatureText =
                         degrees(
                             hour.temperatureC
@@ -175,6 +176,7 @@ class WeatherUiMapper @Inject constructor(
                     conditionUi(
                         day.weatherCode
                     ).emoji,
+                    conditionLabel = conditionUi(day.weatherCode).label,
                     minText =
                     degrees(
                         day.minTemperatureC
