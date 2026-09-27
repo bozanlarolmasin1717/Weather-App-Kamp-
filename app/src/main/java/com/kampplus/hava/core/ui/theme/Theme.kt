@@ -24,16 +24,17 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Teal80,
-    onPrimary = Teal20,
-    primaryContainer = Teal30,
-    onPrimaryContainer = Teal90,
-    secondary = Amber80,
-    background = Neutral10,
-    onBackground = Neutral90,
-    surface = Neutral10,
-    onSurface = Neutral90,
-    onSurfaceVariant = NeutralVariant90,
+    primary = HavaColors.Ice,
+    onPrimary = HavaColors.Ink,
+    primaryContainer = HavaColors.DeepBlue,
+    onPrimaryContainer = HavaColors.TextPrimary,
+    secondary = HavaColors.Sun,
+    background = HavaColors.Ink,
+    onBackground = HavaColors.TextPrimary,
+    surface = HavaColors.Midnight,
+    onSurface = HavaColors.TextPrimary,
+    surfaceVariant = HavaColors.Storm,
+    onSurfaceVariant = HavaColors.TextSecondary,
     error = Red80
 )
 

@@ -21,6 +21,22 @@ internal val NeutralVariant90 = Color(0xFFDAE4E5)
 internal val Red40 = Color(0xFFBA1A1A)
 internal val Red80 = Color(0xFFFFB4AB)
 
+object HavaColors {
+    val Ink = Color(0xFF07111F)
+    val Midnight = Color(0xFF091528)
+    val DeepBlue = Color(0xFF102D55)
+    val Storm = Color(0xFF182537)
+    val Cloud = Color(0xFF50657A)
+    val Sun = Color(0xFFFFC35C)
+    val Ice = Color(0xFFBDEBFF)
+    val TextPrimary = Color(0xFFF7FAFF)
+    val TextSecondary = Color(0xFFBECBDD)
+    val Glass = Color(0x2EFFFFFF)
+    val GlassStrong = Color(0x42FFFFFF)
+    val GlassBorder = Color(0x38FFFFFF)
+    val GlassShadow = Color(0x52000000)
+}
+
 /** Sıcaklık vurgusu renkleri (soğuk → sıcak). */
 object TemperaturePalette {
     val Freezing = Color(0xFF1565C0)
