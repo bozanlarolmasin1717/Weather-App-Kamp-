@@ -1,5 +1,6 @@
 package com.kampplus.hava.feature.weather.presentation.detail.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,15 +27,17 @@ fun DailyForecastItem(day: DailyUiModel, modifier: Modifier = Modifier) {
         verticalAlignment =
         Alignment.CenterVertically
     ) {
-        Text(
-            text =
-            day.dayLabel.asString(),
-            style =
-            MaterialTheme.typography
-                .bodyLarge,
-            modifier =
-            Modifier.weight(1f)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = day.dayLabel.asString(),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = day.dateText,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
         Text(
             text =

@@ -24,8 +24,39 @@
   <string name="detail_hourly">Saatlik</string>
   <string name="detail_daily">7 Günlük</string>
   <string name="detail_feels_like">Hissedilen</string>
+  <string name="detail_feels_like_value">Hissedilen %1$s</string>
   <string name="detail_humidity">Nem</string>
   <string name="detail_wind">Rüzgâr</string>
+  <string name="detail_high_low">En yüksek %1$s  •  En düşük %2$s</string>
+  <string name="detail_insight">Bugünün Yorumu</string>
+  <string name="detail_timeline">Bugünün Akışı</string>
+  <string name="detail_sunrise">Gün doğumu</string>
+  <string name="detail_sunset">Gün batımı</string>
+
+  <string name="insight_thunderstorm">Bugün gök gürültülü fırtına bekleniyor.</string>
+  <string name="insight_rain_afternoon">Öğleden sonra yağmur bekleniyor.</string>
+  <string name="insight_rain">Bugün yağmur bekleniyor.</string>
+  <string name="insight_snow">Bugün kar yağışı bekleniyor.</string>
+  <string name="insight_strong_wind">Günün ilerleyen saatlerinde kuvvetli rüzgâr bekleniyor.</string>
+  <string name="insight_cooling">Akşam saatlerinde daha soğuk hissedilecek.</string>
+  <string name="insight_warm_clear">Ilık ve açık bir gün bekleniyor.</string>
+  <string name="advice_avoid_exposed">Açık ve korumasız alanlardan uzak dur.</string>
+  <string name="advice_take_umbrella">Yanına şemsiye al.</string>
+  <string name="advice_extra_travel_time">Yolculuk için biraz daha fazla zaman ayır.</string>
+  <string name="advice_secure_items">Dışarıdaki gevşek eşyaları sabitle.</string>
+  <string name="advice_light_jacket">İnce bir ceket faydalı olabilir.</string>
+  <string name="advice_outdoor_plans">Dışarıdaki planlar için uygun görünüyor.</string>
+
+  <string name="timeline_rain_begins">Yağmur başlıyor</string>
+  <string name="timeline_rain_easing">Yağmur hafifliyor</string>
+  <string name="timeline_rain_continuing">Yağmur devam ediyor</string>
+  <string name="timeline_getting_warmer">Hava ısınıyor</string>
+  <string name="timeline_getting_cooler">Hava serinliyor</string>
+  <string name="timeline_strong_winds">Kuvvetli rüzgâr başlıyor</string>
+  <string name="timeline_evening_cooling">Gün batımından sonra serinliyor</string>
+  <string name="timeline_conditions_improving">Koşullar akşama doğru iyileşiyor.</string>
+  <string name="timeline_keep_rain_protection">Yağmura karşı hazırlıklı ol.</string>
+  <string name="timeline_dress_warmer">Daha sıcak koşullara göre hazırlan.</string>
 
   <string name="action_share">Paylaş</string>
   <string name="share_text">%1$s şu an %2$s %3$s %4$s</string>

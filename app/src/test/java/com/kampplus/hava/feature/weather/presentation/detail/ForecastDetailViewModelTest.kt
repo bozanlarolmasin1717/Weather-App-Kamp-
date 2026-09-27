@@ -12,7 +12,10 @@ import com.kampplus.hava.feature.favorites.data.local.InMemoryFavoriteCityDataSo
 import com.kampplus.hava.feature.favorites.data.repository.FavoriteCityRepositoryImpl
 import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIdsUseCase
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
+import com.kampplus.hava.feature.weather.domain.model.HourlyForecast
+import com.kampplus.hava.feature.weather.domain.model.WeatherCode
 import com.kampplus.hava.feature.weather.domain.usecase.GetForecastUseCase
+import com.kampplus.hava.feature.weather.presentation.visual.WeatherVisualState
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
 import com.kampplus.hava.testing.forecast
@@ -227,6 +230,72 @@ class ForecastDetailViewModelTest {
                 )
                 assertEquals("Europe/Berlin", model.timeZoneId)
             }
+    }
+
+    @Test
+    fun `maps insight timeline atmosphere and today's solar metrics`() = runTest {
+        val base = forecast()
+        val date = base.current.observedAt.toLocalDate()
+        repository.forecastResult = {
+            AppResult.Success(
+                base.copy(
+                    current = base.current.copy(isDay = true),
+                    hourly = listOf(
+                        HourlyForecast(
+                            time = date.atTime(13, 0),
+                            temperatureC = 21.0,
+                            weatherCode = WeatherCode(1),
+                            precipitationProbability = 10,
+                            isDay = true
+                        ),
+                        HourlyForecast(
+                            time = date.atTime(14, 0),
+                            temperatureC = 20.0,
+                            weatherCode = WeatherCode(61),
+                            precipitationProbability = 80,
+                            precipitationMm = 0.8,
+                            isDay = true
+                        ),
+                        HourlyForecast(
+                            time = date.atTime(15, 0),
+                            temperatureC = 19.0,
+                            weatherCode = WeatherCode(61),
+                            precipitationProbability = 70,
+                            precipitationMm = 0.4,
+                            isDay = true
+                        ),
+                        HourlyForecast(
+                            time = date.atTime(16, 0),
+                            temperatureC = 19.0,
+                            weatherCode = WeatherCode(2),
+                            precipitationProbability = 10,
+                            isDay = true
+                        )
+                    ),
+                    daily = listOf(
+                        base.daily.first().copy(
+                            sunrise = date.atTime(6, 42),
+                            sunset = date.atTime(18, 48)
+                        )
+                    )
+                )
+            )
+        }
+
+        createViewModel().uiState.test {
+            awaitItem()
+            val model = (awaitItem() as UiState.Success).data
+
+            assertEquals(WeatherVisualState.ClearSunny, model.visualState)
+            assertEquals(UiText.Resource(R.string.insight_rain_afternoon), model.insight?.headline)
+            assertEquals("14:00", model.insight?.timeText)
+            assertEquals(2, model.timeline.size)
+            assertEquals(UiText.Resource(R.string.timeline_rain_begins), model.timeline.first().headline)
+            assertEquals("24°", model.highText)
+            assertEquals("12°", model.lowText)
+            assertEquals("06:42", model.sunriseText)
+            assertEquals("18:48", model.sunsetText)
+        }
     }
 
     @Test

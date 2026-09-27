@@ -1,16 +1,23 @@
 package com.kampplus.hava.feature.weather.presentation.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,20 +26,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kampplus.hava.R
 import com.kampplus.hava.core.ui.component.ErrorView
 import com.kampplus.hava.core.ui.component.FavoriteToggleButton
+import com.kampplus.hava.core.ui.component.GlassSurface
 import com.kampplus.hava.core.ui.component.LoadingView
-import com.kampplus.hava.core.ui.component.TemperatureBadge
+import com.kampplus.hava.core.ui.component.WeatherSectionLabel
 import com.kampplus.hava.core.ui.state.UiState
 import com.kampplus.hava.core.ui.text.UiText
+import com.kampplus.hava.core.ui.theme.HavaColors
 import com.kampplus.hava.core.ui.theme.HavaTheme
 import com.kampplus.hava.feature.weather.presentation.detail.component.DailyForecastItem
 import com.kampplus.hava.feature.weather.presentation.detail.component.HourlyForecastRow
@@ -40,7 +54,10 @@ import com.kampplus.hava.feature.weather.presentation.detail.component.ShareButt
 import com.kampplus.hava.feature.weather.presentation.model.DailyUiModel
 import com.kampplus.hava.feature.weather.presentation.model.ForecastUiModel
 import com.kampplus.hava.feature.weather.presentation.model.HourlyUiModel
-import com.kampplus.hava.feature.weather.presentation.model.temperatureColor
+import com.kampplus.hava.feature.weather.presentation.model.TimelineEventUiModel
+import com.kampplus.hava.feature.weather.presentation.model.WeatherInsightUiModel
+import com.kampplus.hava.feature.weather.presentation.visual.AtmosphericWeatherBackground
+import com.kampplus.hava.feature.weather.presentation.visual.WeatherVisualState
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -56,75 +73,63 @@ fun ForecastDetailScreen(
     modifier: Modifier = Modifier,
     isRefreshing: Boolean = false
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        (uiState as? UiState.Success)
-                            ?.data
-                            ?.cityName
-                            ?: stringResource(R.string.detail_title)
+    val forecast = (uiState as? UiState.Success)?.data
+
+    AtmosphericWeatherBackground(
+        state = forecast?.visualState ?: WeatherVisualState.ClearNight,
+        modifier = modifier
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.action_back)
+                            )
+                        }
+                    },
+                    actions = {
+                        forecast?.let {
+                            FavoriteToggleButton(
+                                isFavorite = it.isFavorite,
+                                onClick = onFavoriteClick
+                            )
+                            ShareButton(
+                                onClick = {
+                                    onShare(it)
+                                }
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent
                     )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBack
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (uiState is UiState.Success) {
-                        FavoriteToggleButton(
-                            isFavorite = uiState.data.isFavorite,
-                            onClick = onFavoriteClick
-                        )
-
-                        ShareButton(
-                            onClick = {
-                                onShare(uiState.data)
-                            }
-                        )
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = onRefresh,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when (uiState) {
-                UiState.Loading -> {
-                    LoadingView()
-                }
-
-                UiState.Empty -> {
-                    ErrorView(
+                )
+            }
+        ) { innerPadding ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                when (uiState) {
+                    UiState.Loading -> LoadingView()
+                    UiState.Empty -> ErrorView(
                         message = stringResource(R.string.error_not_found)
                     )
-                }
-
-                is UiState.Error -> {
-                    ErrorView(
+                    is UiState.Error -> ErrorView(
                         message = uiState.message.asString(),
                         onRetry = onRetry
                     )
-                }
-
-                is UiState.Success -> {
-                    ForecastContent(
-                        forecast = uiState.data
-                    )
+                    is UiState.Success -> ForecastContent(uiState.data)
                 }
             }
         }
@@ -136,161 +141,285 @@ private fun ForecastContent(forecast: ForecastUiModel, modifier: Modifier = Modi
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .padding(
-                vertical = 16.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(
-            16.dp
-        )
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 36.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         CurrentWeatherHeader(
             forecast = forecast,
-            modifier = Modifier.padding(
-                horizontal = 16.dp
-            )
+            modifier = Modifier.padding(horizontal = 20.dp)
         )
 
-        SectionTitle(
-            text = stringResource(
-                R.string.detail_hourly
+        forecast.insight?.let {
+            InsightSection(
+                insight = it,
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
-        )
-
-        HourlyForecastRow(
-            items = forecast.hourly
-        )
-
-        SectionTitle(
-            text = stringResource(
-                R.string.detail_daily
-            )
-        )
-
-        Card(
-            modifier = Modifier.padding(
-                horizontal = 16.dp
-            )
-        ) {
-            forecast.daily.forEachIndexed { index, day ->
-                if (index > 0) {
-                    HorizontalDivider()
-                }
-
-                DailyForecastItem(
-                    day = day
-                )
-            }
         }
+
+        if (forecast.hourly.isNotEmpty()) {
+            ForecastSectionTitle(stringResource(R.string.detail_hourly))
+            HourlyForecastRow(items = forecast.hourly)
+        }
+
+        if (forecast.timeline.isNotEmpty()) {
+            TimelineSection(
+                events = forecast.timeline,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+        }
+
+        if (forecast.daily.isNotEmpty()) {
+            DailySection(
+                days = forecast.daily,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+        }
+
+        MetricsSection(
+            forecast = forecast,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
     }
 }
 
 @Composable
 private fun CurrentWeatherHeader(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(
-            12.dp
-        )
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(
-                16.dp
-            )
-        ) {
-            TemperatureBadge(
-                text = forecast.temperatureText,
-                containerColor = temperatureColor(
-                    forecast.temperatureC
-                ),
-                size = 88.dp
-            )
-
-            Column {
-                Text(
-                    text = forecast.subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Text(
-                    text = "${forecast.conditionEmoji} ${forecast.conditionLabel.asString()}",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-        }
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        vertical = 12.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                forecast.feelsLikeText?.let { value ->
-                    Metric(
-                        label = stringResource(
-                            R.string.detail_feels_like
-                        ),
-                        value = value
-                    )
-                }
-
-                forecast.humidityText?.let { value ->
-                    Metric(
-                        label = stringResource(
-                            R.string.detail_humidity
-                        ),
-                        value = value
-                    )
-                }
-
-                forecast.windText?.let { value ->
-                    Metric(
-                        label = stringResource(
-                            R.string.detail_wind
-                        ),
-                        value = value
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Metric(label: String, value: String) {
-    Column(
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium
+            text = forecast.cityName,
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center
+        )
+
+        if (forecast.subtitle.isNotBlank()) {
+            Text(
+                text = forecast.subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = forecast.temperatureText,
+            style = MaterialTheme.typography.displayLarge.copy(
+                fontSize = 96.sp,
+                lineHeight = 100.sp,
+                fontWeight = FontWeight.ExtraLight
+            )
         )
 
         Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = "${forecast.conditionEmoji} ${forecast.conditionLabel.asString()}",
+            style = MaterialTheme.typography.titleLarge
         )
+
+        forecast.feelsLikeText?.let {
+            Text(
+                text = stringResource(R.string.detail_feels_like_value, it),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (forecast.highText != null && forecast.lowText != null) {
+            Text(
+                text = stringResource(
+                    R.string.detail_high_low,
+                    forecast.highText,
+                    forecast.lowText
+                ),
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
     }
 }
 
 @Composable
-private fun SectionTitle(text: String) {
-    Text(
+private fun InsightSection(insight: WeatherInsightUiModel, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        WeatherSectionLabel(stringResource(R.string.detail_insight))
+        GlassSurface(
+            modifier = Modifier.fillMaxWidth(),
+            emphasized = true
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                insight.timeText?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Text(
+                    text = insight.headline.asString(),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                insight.advice?.let {
+                    Text(
+                        text = it.asString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimelineSection(events: List<TimelineEventUiModel>, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        WeatherSectionLabel(stringResource(R.string.detail_timeline))
+        events.forEachIndexed { index, event ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = event.timeText,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.width(54.dp)
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(24.dp)
+                ) {
+                    Box(
+                        Modifier
+                            .size(8.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    )
+                    if (index != events.lastIndex) {
+                        Box(
+                            Modifier
+                                .width(1.dp)
+                                .height(50.dp)
+                                .background(HavaColors.GlassBorder)
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp, bottom = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = event.headline.asString(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    event.detail?.let {
+                        Text(
+                            text = it.asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DailySection(days: List<DailyUiModel>, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        WeatherSectionLabel(stringResource(R.string.detail_daily))
+        GlassSurface(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 6.dp)
+        ) {
+            Column {
+                days.forEachIndexed { index, day ->
+                    if (index > 0) {
+                        HorizontalDivider(
+                            color = HavaColors.GlassBorder.copy(alpha = 0.55f)
+                        )
+                    }
+                    DailyForecastItem(day)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MetricsSection(forecast: ForecastUiModel, modifier: Modifier = Modifier) {
+    val metrics = listOfNotNull(
+        forecast.humidityText?.let { stringResource(R.string.detail_humidity) to it },
+        forecast.windText?.let { stringResource(R.string.detail_wind) to it },
+        forecast.sunriseText?.let { stringResource(R.string.detail_sunrise) to it },
+        forecast.sunsetText?.let { stringResource(R.string.detail_sunset) to it }
+    )
+    if (metrics.isEmpty()) {
+        return
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        metrics.chunked(2).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                row.forEach { (label, value) ->
+                    MetricPanel(
+                        label = label,
+                        value = value,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (row.size == 1) {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MetricPanel(label: String, value: String, modifier: Modifier = Modifier) {
+    GlassSurface(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            WeatherSectionLabel(label)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun ForecastSectionTitle(text: String) {
+    WeatherSectionLabel(
         text = text,
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(
-            horizontal = 16.dp
-        )
+        modifier = Modifier.padding(horizontal = 20.dp)
     )
 }
 
@@ -310,9 +439,19 @@ private fun ForecastDetailScreenPreview() {
                     conditionLabel = UiText.Dynamic("Açık"),
                     isDay = true,
                     timeZoneId = "Europe/Istanbul",
+                    visualState = WeatherVisualState.ClearSunny,
                     feelsLikeText = "20°",
                     humidityText = "%45",
                     windText = "12 km/sa",
+                    highText = "24°",
+                    lowText = "14°",
+                    sunriseText = "06:42",
+                    sunsetText = "18:48",
+                    insight = WeatherInsightUiModel(
+                        headline = UiText.Dynamic("Ilık ve açık bir gün bekleniyor."),
+                        advice = UiText.Dynamic("Dışarıdaki planlar için uygun görünüyor."),
+                        timeText = "12:00"
+                    ),
                     hourly = List(8) {
                         HourlyUiModel(
                             time = LocalDateTime.of(2026, 9, 24, 10 + it, 0),
