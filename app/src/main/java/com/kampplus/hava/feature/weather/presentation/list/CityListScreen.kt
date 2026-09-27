@@ -11,14 +11,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kampplus.hava.R
@@ -31,10 +35,10 @@ import com.kampplus.hava.core.ui.theme.HavaTheme
 import com.kampplus.hava.feature.weather.presentation.list.component.CitySearchField
 import com.kampplus.hava.feature.weather.presentation.list.component.CityWeatherCard
 import com.kampplus.hava.feature.weather.presentation.model.CityWeatherUiModel
+import com.kampplus.hava.feature.weather.presentation.visual.AtmosphericWeatherBackground
+import com.kampplus.hava.feature.weather.presentation.visual.WeatherVisualState
 
-@OptIn(
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CityListScreen(
     uiState: CityListUiState,
@@ -45,63 +49,54 @@ fun CityListScreen(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            R.string.list_title
+    AtmosphericWeatherBackground(
+        state = WeatherVisualState.ClearNight,
+        modifier = modifier
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.list_title),
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.SemiBold
                         )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent
+                    )
+                )
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                CitySearchField(
+                    query = uiState.query,
+                    onQueryChange = onQueryChange,
+                    modifier = Modifier.padding(
+                        horizontal = 20.dp,
+                        vertical = 8.dp
+                    )
+                )
+
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ListContent(
+                        uiState = uiState,
+                        onCityClick = onCityClick,
+                        onFavoriteClick = onFavoriteClick,
+                        onRetry = onRetry
                     )
                 }
-            )
-        }
-    ) { innerPadding ->
-
-        Column(
-            modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(
-                    innerPadding
-                )
-        ) {
-            CitySearchField(
-                query =
-                uiState.query,
-                onQueryChange =
-                onQueryChange,
-                modifier =
-                Modifier.padding(
-                    horizontal =
-                    16.dp,
-                    vertical =
-                    8.dp
-                )
-            )
-
-            PullToRefreshBox(
-                isRefreshing =
-                uiState
-                    .isRefreshing,
-                onRefresh =
-                onRefresh,
-                modifier =
-                Modifier
-                    .fillMaxSize()
-            ) {
-                ListContent(
-                    uiState =
-                    uiState,
-                    onCityClick =
-                    onCityClick,
-                    onFavoriteClick =
-                    onFavoriteClick,
-                    onRetry =
-                    onRetry
-                )
             }
         }
     }
@@ -116,66 +111,35 @@ private fun ListContent(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier =
-        modifier.fillMaxSize(),
-        contentAlignment =
-        Alignment.Center
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        when (
-            val content =
-                uiState.content
-        ) {
-            UiState.Loading ->
-                ShimmerList()
+        when (val content = uiState.content) {
+            UiState.Loading -> ShimmerList()
 
-            UiState.Empty ->
-                EmptyView(
-                    icon =
-                    Icons.Filled.Search,
-                    title =
+            UiState.Empty -> EmptyView(
+                icon = Icons.Filled.Search,
+                title = stringResource(R.string.list_empty_title),
+                message = if (uiState.isSearching) {
                     stringResource(
-                        R.string
-                            .list_empty_title
-                    ),
-                    message =
-                    if (
-                        uiState
-                            .isSearching
-                    ) {
-                        stringResource(
-                            R.string
-                                .search_empty_message,
-                            uiState
-                                .query
-                                .trim()
-                        )
-                    } else {
-                        stringResource(
-                            R.string
-                                .list_empty_message
-                        )
-                    }
-                )
+                        R.string.search_empty_message,
+                        uiState.query.trim()
+                    )
+                } else {
+                    stringResource(R.string.list_empty_message)
+                }
+            )
 
-            is UiState.Error ->
-                ErrorView(
-                    message =
-                    content
-                        .message
-                        .asString(),
-                    onRetry =
-                    onRetry
-                )
+            is UiState.Error -> ErrorView(
+                message = content.message.asString(),
+                onRetry = onRetry
+            )
 
-            is UiState.Success ->
-                CityList(
-                    items =
-                    content.data,
-                    onCityClick =
-                    onCityClick,
-                    onFavoriteClick =
-                    onFavoriteClick
-                )
+            is UiState.Success -> CityList(
+                items = content.data,
+                onCityClick = onCityClick,
+                onFavoriteClick = onFavoriteClick
+            )
         }
     }
 }
@@ -188,33 +152,26 @@ private fun CityList(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier =
-        modifier.fillMaxSize(),
-        contentPadding =
-        PaddingValues(16.dp),
-        verticalArrangement =
-        Arrangement.spacedBy(
-            12.dp
-        )
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 20.dp,
+            top = 12.dp,
+            end = 20.dp,
+            bottom = 28.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         items(
             items = items,
-            key = {
-                it.cityId
-            }
+            key = { it.cityId }
         ) { item ->
-
             CityWeatherCard(
                 item = item,
                 onClick = {
-                    onCityClick(
-                        item.cityId
-                    )
+                    onCityClick(item.cityId)
                 },
                 onFavoriteClick = {
-                    onFavoriteClick(
-                        item.cityId
-                    )
+                    onFavoriteClick(item.cityId)
                 }
             )
         }
@@ -226,29 +183,18 @@ private fun CityList(
 private fun CityListScreenPreview() {
     HavaTheme {
         CityListScreen(
-            uiState =
-            CityListUiState(
-                content =
-                UiState.Success(
+            uiState = CityListUiState(
+                content = UiState.Success(
                     List(5) { index ->
-
                         CityWeatherUiModel(
-                            cityId =
-                            index.toLong(),
-                            title =
-                            "İstanbul",
-                            subtitle =
-                            "İstanbul, Türkiye",
-                            temperatureText =
-                            "2$index°",
-                            temperatureC =
-                            20.0 + index,
-                            conditionEmoji =
-                            "⛅",
-                            conditionLabel =
-                            UiText.Dynamic(
-                                "Parçalı bulutlu"
-                            )
+                            cityId = index.toLong(),
+                            title = "İstanbul",
+                            subtitle = "İstanbul, Türkiye",
+                            temperatureText = "2$index°",
+                            temperatureC = 20.0 + index,
+                            conditionEmoji = "⛅",
+                            conditionLabel = UiText.Dynamic("Parçalı bulutlu"),
+                            visualState = WeatherVisualState.Cloudy
                         )
                     }
                 )

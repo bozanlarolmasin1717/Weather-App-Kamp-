@@ -2,8 +2,8 @@ package com.kampplus.hava.core.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.kampplus.hava.R
 import kotlin.reflect.KClass
@@ -18,8 +18,8 @@ enum class TopLevelDestination(
     List(
         ListDestination,
         ListDestination::class,
-        Icons.AutoMirrored.Filled.List,
-        R.string.nav_list
+        Icons.Filled.Home,
+        R.string.nav_weather
     ),
 
     Favorites(

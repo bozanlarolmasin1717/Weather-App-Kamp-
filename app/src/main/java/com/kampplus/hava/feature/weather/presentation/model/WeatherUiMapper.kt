@@ -7,6 +7,7 @@ import com.kampplus.hava.feature.weather.domain.model.CityWeather
 import com.kampplus.hava.feature.weather.domain.model.Forecast
 import com.kampplus.hava.feature.weather.domain.model.WeatherCode
 import com.kampplus.hava.feature.weather.domain.policy.WeatherConditionClassifier
+import com.kampplus.hava.feature.weather.presentation.visual.WeatherVisualStateResolver
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -15,7 +16,8 @@ import kotlin.math.roundToInt
 
 class WeatherUiMapper @Inject constructor(
     private val conditionClassifier: WeatherConditionClassifier,
-    private val conditionUiRegistry: WeatherConditionUiRegistry
+    private val conditionUiRegistry: WeatherConditionUiRegistry,
+    private val visualStateResolver: WeatherVisualStateResolver
 ) {
 
     fun toListItem(cityWeather: CityWeather, isFavorite: Boolean = false): CityWeatherUiModel = with(cityWeather) {
@@ -38,6 +40,11 @@ class WeatherUiMapper @Inject constructor(
             conditionUi.emoji,
             conditionLabel =
             conditionUi.label,
+            visualState = visualStateResolver.resolve(
+                weatherCode = current.weatherCode,
+                isDay = current.isDay,
+                cityLocalTime = current.observedAt
+            ),
             isFavorite =
             isFavorite
         )

@@ -33,7 +33,7 @@
   <string name="action_add_favorite">Favorilere ekle</string>
   <string name="action_remove_favorite">Favorilerden çıkar</string>
 
-  <string name="nav_list">Şehirler</string>
+  <string name="nav_weather">Hava</string>
   <string name="nav_favorites">Favoriler</string>
 
   <string name="favorites_title">Favori Şehirlerim</string>

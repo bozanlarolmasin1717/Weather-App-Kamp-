@@ -10,6 +10,7 @@ import com.kampplus.hava.feature.favorites.domain.usecase.ObserveFavoriteCityIds
 import com.kampplus.hava.feature.favorites.domain.usecase.ToggleFavoriteCityUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.GetCityWeathersUseCase
 import com.kampplus.hava.feature.weather.domain.usecase.SearchCityWeathersUseCase
+import com.kampplus.hava.feature.weather.presentation.visual.WeatherVisualState
 import com.kampplus.hava.testing.FakeCityRepository
 import com.kampplus.hava.testing.FakeWeatherRepository
 import com.kampplus.hava.testing.MainDispatcherRule
@@ -72,7 +73,11 @@ class CityListViewModelTest {
                             region = "İzmir"
                         ),
                         temperatureC = 26.6
-                    )
+                    ).let {
+                        it.copy(
+                            current = it.current.copy(isDay = true)
+                        )
+                    }
                 )
             )
         }
@@ -104,6 +109,11 @@ class CityListViewModelTest {
                 assertEquals(
                     "27°",
                     item.temperatureText
+                )
+
+                assertEquals(
+                    WeatherVisualState.ClearSunny,
+                    item.visualState
                 )
             }
     }
